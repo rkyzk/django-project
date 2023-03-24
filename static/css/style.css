@@ -1,0 +1,13 @@
+.graphic-box-left {
+    height: auto;
+    background-color: bisque;
+  }
+  
+  .graphic-box-right {
+    height: auto;
+    background-color: azure;
+  }
+  
+  h1 {
+    text-align: center;
+  }

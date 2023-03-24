@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container my-3"> <!--container fluid? -->
+  <h2>My Posts</h2>
+  <div class="row">
+    {% if queryset %}
+    {% for post in queryset %}
+      <div class="col-md-4">
+        <div class="image-container">
+          {% if "placeholder" in post.featured_images.url %}
+            <img class="card-img-top" src="../media/placeholder.jpg">
+          {% else %}
+            <img class="card-img-top" src=" {{ post.featured_images.url }}">
+          {% endif %}
+          <div class="image-flash">
+            <p class="author">Author: {{ post.author }}</p>
+            <strong><p>{{ post.title }}</p></strong>
+            <p>{{ post.excerpt }}</p>
+            <a href="{% url 'post_detail' post.slug  %}">Read the full story</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    {% else %}
+      <p>You haven't written any posts.</p>
+    {% endif %}
+  </div>
+  <div class="row">
+    {% for post in posts_i_commented %}
+    <div class="col-md-4">
+      <div class="image-container">
+        {% if "placeholder" in post.featured_images.url %}
+          <img class="card-img-top" src="../media/placeholder.jpg">
+        {% else %}
+          <img class="card-img-top" src=" {{ post.featured_images.url }}">
+        {% endif %}
+        <div class="image-flash">
+          <p class="author">Author: {{ post.author }}</p>
+          <strong><p>{{ post.title }}</p></strong>
+          <p>{{ post.excerpt }}</p>
+          <a href="{% url 'post_detail' post.slug  %}">Read the full story</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="row">
+    {% for post in my_favorite %}
+    <div class="col-md-4">
+      <div class="image-container">
+        {% if "placeholder" in post.featured_images.url %}
+          <img class="card-img-top" src="../media/placeholder.jpg">
+        {% else %}
+          <img class="card-img-top" src=" {{ post.featured_images.url }}">
+        {% endif %}
+        <div class="image-flash">
+          <p class="author">Author: {{ post.author }}</p>
+          <strong><p>{{ post.title }}</p></strong>
+          <p>{{ post.excerpt }}</p>
+          <a href="{% url 'post_detail' post.slug  %}">Read the full story</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

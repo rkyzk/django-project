@@ -1,4 +1,47 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>lovely!</h1>
+<!-- intro -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-3 graphic-box-left">
+
+    </div>
+    <div class="col-6">
+      <h1>Eco Post</h1>
+      <p>Depressed about climate change?</p>
+      <p>This website is for anyone who wants to find out what some local communities
+         and individuals all over the world are doing to tackle the issue and/or 
+         more generally to save the environment.  Read their stories,
+         get inspired, send comments to them, join them if you can, or start up your own
+         activities and share your stories.
+      </p>
+    </div>
+    <div class="col-3 graphic-box-right">
+
+    </div>
+  </div>
+</div>
+<div class="container my-3"> <!--container fluid? -->
+  <h2>Featured Stories</h2>
+  <div class="row">
+    {% for post in post_list %}  <!-- post_list !?? -->
+      <div class="col-md-4">
+        <div class="image-container">
+          {% if "placeholder" in post.featured_image.url %}
+            <img class="card-img-top" src="../media/placeholder.jpg" alt="woods">
+          {% else %}
+            <img class="card-img-top" src="{{ post.featured_images.url }}" alt="{{ post.title }}">
+          {% endif %}
+          <div class="image-flash">
+            <p class="author">Author: {{ post.author }}</p>
+            <strong><p>{{ post.title }}</p></strong>
+            <p>{{ post.excerpt }}</p>
+            <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
