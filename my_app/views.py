@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic, View
 from django.http import HttpResponseRedirect
+from django.contrib import messages
 from .models import Post, Comment
 from .forms import CommentForm, PostForm
 
@@ -14,42 +15,72 @@ class PostList(generic.ListView):
 
 class PostDetail(View):
     def get(self, request, slug, *args, **kwargs):
-        # print(slug)
-        # queryset = Post.objects.filter(status=1)
-        # post = get_object_or_404(queryset, slug=slug)
-        # comments = post.comments.filter(approved=True).order_by('created_on')
+        post = Post.objects.filter(slug=slug)[0]
+        comments = post.comments.filter(approved=True).order_by('created_on')
+        liked = False
+        if post.likes.filter(id=self.request.user.id).exists():
+            liked = True
+
+        bookmarked = False
+        if post.bookmark.filter(id=self.request.user.id).exists():
+            bookmarked = True
 
         return render(
             request,
             "post_detail.html",
-            # {
-            #     "post": post,
-            #     "comments": comments
-            # }
+            {
+                "post": post,
+                "comments": comments,
+                "commented": False,
+                "liked": liked,
+                "bookmarked": bookmarked,
+                "comment_form": CommentForm()
+            },
+        )
+
+    def post(self, request, slug, *args, **kwargs):
+        post = Post.objects.filter(slug=slug)[0]
+        comments = post.comments.filter(approved=True).order_by('created_on')
+        liked = False
+        if post.likes.filter(id=self.request.user.id).exists():
+            liked = True
+        bookmarked = False
+        if post.bookmark.filter(id=self.request.user.id).exists():
+            bookmarked = True
+
+        comment_form = CommentForm(data=request.POST)
+
+        if comment_form.is_valid():
+            comment_form.instance.email = request.user.email
+            comment_form.instance.name = request.user
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.save()
+        else:
+            comment_form = CommentForm()
+        return render(
+            request,
+            "post_detail.html",
+            {
+                "post": post,
+                "comments": comments,
+                "commented": True,
+                "liked": liked,
+                "bookmarked": bookmarked,
+                "comment_form": CommentForm()
+            },
         )
 
 
-# class PostDetail(generic.ListView):
-#     model = Post
-#     template_name = "post_detail.html"
+class PostLike(View):
 
-#     def get_context_data(self, **kwargs):
-#         """
-#         """
-#         context = super().get_context_data(**kwargs)
-#         return context
-
-
-# class PostLike(View):
-
-#     def post(self, request, slug):
-#         post = get_object_or_404(Post, slug=slug)
-
-#         if post.likes.filter(id=request.user.id).exists():
-#             post.likes.remove(request.user)
-#         else:
-#             post.likes.add(request.user)
-#         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+    def post(self, request, slug, *args, **kwargs):
+        post = get_object_or_404(Post, slug=slug)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+        else:
+            post.likes.add(request.user)
+        return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
 class About(View):
@@ -61,16 +92,53 @@ class About(View):
         )
 
 
-class AddStory(View):
-    def get(self, request, *args, **kwargs):
-        post_form = PostForm()
-        return render(
-            request,
-            "add_story.html",
-            {
-                "post_form": post_form,
-            }
-        )
+# class AddStory(View):
+#     def get(self, request, *args, **kwargs):
+#         post_form = PostForm()
+#         return render(
+#             request,
+#             "add_story.html",
+#             {
+#                 "post_form": post_form,
+#             }
+#         )
+
+#     def post(self, request, *args, **kwargs):
+#         post_form = PostForm(data=request.POST)
+#         post = post_form.save(commit=False)
+#         if post_form.is_valid():
+#             if 'save' in request.POST:
+#                 post.status = 0
+#                 messages.add_message(request, messages.SUCCESS, 'Your draft was saved.')
+#             else:
+#                 post.status = 1
+#                 messages.add_message(request, messages.SUCCESS, 'Your draft was submitted.')
+#             post.save()  
+#         return render(request, "add_story.html", {'post_form': PostForm()})
+
+#         def form_valid(self, form):
+#             form.instance.author = self.request.user
+#             return super().form_valid(form)
+
+class AddStory(generic.CreateView):
+    model = Post
+    template_name = "add_story.html"
+    fields = ('title', 'content', 'featured_image', 'region', 'category')
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        if 'submit' in self.request.POST.keys():
+            form.instance.status = 1
+        else:
+            pass
+        return super().form_valid(form)
+
+# messages.add_message(request, messages.SUCCESS, 'Your draft has been submitted.')
+# messages.add_message(request, messages.SUCCESS, 'Your draft has been saved.') 
+
+
+class UpdatePost(generic.UpdateView):
+    model = Post
 
 
 class Search(View):
@@ -98,12 +166,30 @@ class MyPage(View):
         commented_posts = [comment.post for comment in comments]
         # remove duplicates
         commented_posts = list(dict.fromkeys(commented_posts))
+        # this can be made concise
+        all_posts = Post.objects.all()
+        bookmarked_posts = []
+        for post in all_posts:
+            if post.bookmark.filter(id=request.user.id).exists():
+                bookmarked_posts.append(post)
 
         return render(
             request,
             "my_page.html",
             {
                 "queryset": queryset,
-                "commented_posts": commented_posts
+                "commented_posts": commented_posts,
+                "bookmarked_posts": bookmarked_posts
             },
         )
+
+
+class Bookmark(View):
+    def post(self, request, slug, *args, **kwargs):
+        post = get_object_or_404(Post, slug=slug)
+
+        if post.bookmark.filter(id=request.user.id).exists():
+            post.bookmark.remove(request.user)
+        else:
+            post.bookmark.add(request.user)
+        return HttpResponseRedirect(reverse('post_detail', args=[slug]))

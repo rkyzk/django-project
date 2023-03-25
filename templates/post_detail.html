@@ -25,37 +25,56 @@
   </div>
   <div class="row">
     <div class="col-1">
+      <strong>
+        {% if user.is_authenticated %}
+          <form class="d-inline" action="{% url 'post_like' post.slug %}" method="POST">
+            {% csrf_token %}
+            {% if liked %}
+              <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn">
+                <i class="fa-solid fa-heart"></i>
+              </button>
+            {% else %}
+              <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+            {% endif %}
+          </form>
+        {% else %}
+          <span class="text-secondary"><i class="far fa-heart"></i></span>
+        {% endif %}
+          <!-- The number of likes goes before the closing strong tag -->
+          <span class="text-secondary">{{ post.number_of_likes }}</span>
+      </strong>
+    </div>
+    <div class="col-2">
       {% if user.is_authenticated %}
-        <form class="d-inline" action="#" method="POST">
+        <form class="d-inline" action="{% url 'bookmark' post.slug %}" method="POST">
           {% csrf_token %}
-          {% if post.liked %}
-            <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn-like">
-              <p>liked</p>
-            </button>
-          {% else %}
-            <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn-like">
-              <p>not yet liked</p>
-            </button>
-          {% endif %}
-        </form>
-        <form class="d-inline" action="#" method="POST">
-          {% csrf_token %}
-          {% if post.bookmark %}
+          {% if bookmarked %}
             <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn">
+              <i class="fa fa-bookmark" aria-hidden="true"></i>
             </button>
             <p>You've bookmarked this post</p>
           {% else %}
             <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn">
+              <i class="fa fa-bookmark-o" aria-hidden="true"></i>
             </button>
-            <p>Bookmark this post</p>
+            <p>Click to bookmark</p>
           {% endif %}           
         </form>
-      {% else %}
-        <span><p>become a member and like me</p></span>
       {% endif %}
-      <span>{{ post.number_of_likes }} </span>
     </div>
   </div>
+  <div class="row">
+    {% if user.is_authenticated %}
+      <form method="GET" action="#">
+        {% csrf_token %}
+        {{ form.as_p }}
+          <input type="submit" value="Update">
+      </form>
+    {% endif %}
+  </div>
+  {% if post.status == 2 %}
   <div class="row">
     <h3>Comments:</h3>
   </div>
@@ -89,6 +108,7 @@
       {% endif %}
     </div>
   </div>
+  {% endif %}
 </div>
 {% endblock content %}
 <!-- {% url 'post_like' post.slug %} 
