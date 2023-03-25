@@ -4,7 +4,7 @@
     <main role="main" class="container">
 
       <h3>Filter Posts</h3>
-      <form method="post" action="{% url 'home' %}">
+      <form method="post" action="{% url 'search' %}">
         {% csrf_token %}
         <div class="form-row mt-3">
             <div class="form-group col-12">
@@ -100,9 +100,9 @@
               <div class="image-container">
                 {% if "placeholder" in post.featured_image.url %}
                 <img class="card-img-top"
-                    src="https://codeinstitute.s3.amazonaws.com/fullstack/blog/default.jpg">
+                    src="https://codeinstitute.s3.amazonaws.com/fullstack/blog/default.jpg" width="40%">
                 {% else %}
-                <img class="card-img-top" src=" {{ post.featured_image.url }}">
+                <img class="card-img-top" src=" {{ post.featured_image.url }}" width="40%">
                 {% endif %}
                 <div class="image-flash">
                     <p class="author">Author: {{ post.author }}</p>

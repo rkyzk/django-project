@@ -9,10 +9,10 @@
     <p>{{ post.author }} | {{ post.created_on }}</p>
   </div>
   <div>
-    {% if "placeholder" in post.featured_images.url %}
+    {% if "placeholder" in post.featured_image.url %}
       <img src="../media/placeholder.jpg" width="70%">
     {% else %}
-      <img src=" {{ post.featured_images.url }}" width="70%">
+      <img src=" {{ post.featured_image.url }}" width="70%">
     {% endif %}
   </div>
 </div>

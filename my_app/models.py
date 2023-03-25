@@ -32,7 +32,7 @@ CATEGORY = (('others', 'others'),)
 
 class Post(models.Model):
     title = models.CharField(max_length=80, unique=True)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=80, unique=True)
     author = models.ForeignKey(User, on_delete=models.SET_DEFAULT,
                                default=1, related_name="posts")
     featured_flag = models.BooleanField(default=False)
@@ -45,9 +45,13 @@ class Post(models.Model):
     region = models.CharField(max_length=30, choices=REGION, default='N/A')
     category = models.CharField(max_length=30, choices=CATEGORY,
                                 default='others')
-    bookmark = models.ManyToManyField(User, related_name='bookmarked', blank=True)
+    bookmark = models.ManyToManyField(User, related_name='bookmarked',
+                                      blank=True)
 
- 
+    def save(self, *args, **kwargs):
+        self.slug = self.slug or slugify(self.title)
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ['-created_on']
 

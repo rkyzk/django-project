@@ -31,12 +31,12 @@
           {% if "placeholder" in post.featured_image.url %}
             <img class="card-img-top" src="../media/placeholder.jpg" alt="woods">
           {% else %}
-            <img class="card-img-top" src="{{ post.featured_images.url }}" alt="{{ post.title }}">
+            <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
           {% endif %}
           <div class="image-flash">
             <p class="author">Author: {{ post.author }}</p>
             <strong><p>{{ post.title }}</p></strong>
-            <p>{{ post.excerpt }}</p>
+            <p>{{ post.content }}</p>
             <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
           </div>
         </div>

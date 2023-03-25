@@ -14,7 +14,30 @@ class PostList(generic.ListView):
 
 class PostDetail(View):
     def get(self, request, slug, *args, **kwargs):
-        return render(request, "post_detail.html")
+        # print(slug)
+        # queryset = Post.objects.filter(status=1)
+        # post = get_object_or_404(queryset, slug=slug)
+        # comments = post.comments.filter(approved=True).order_by('created_on')
+
+        return render(
+            request,
+            "post_detail.html",
+            # {
+            #     "post": post,
+            #     "comments": comments
+            # }
+        )
+
+
+# class PostDetail(generic.ListView):
+#     model = Post
+#     template_name = "post_detail.html"
+
+#     def get_context_data(self, **kwargs):
+#         """
+#         """
+#         context = super().get_context_data(**kwargs)
+#         return context
 
 
 # class PostLike(View):
@@ -70,4 +93,17 @@ class Search(View):
 
 class MyPage(View):
     def get(self, request, id, *args, **kwargs):
-        return render(request, "my_page.html")
+        queryset = Post.objects.filter(author=id)
+        comments = Comment.objects.filter(name=id)
+        commented_posts = [comment.post for comment in comments]
+        # remove duplicates
+        commented_posts = list(dict.fromkeys(commented_posts))
+
+        return render(
+            request,
+            "my_page.html",
+            {
+                "queryset": queryset,
+                "commented_posts": commented_posts
+            },
+        )
