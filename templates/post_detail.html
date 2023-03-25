@@ -66,11 +66,14 @@
     </div>
   </div>
   <div class="row">
-    {% if user.is_authenticated %}
-      <form method="GET" action="#">
+    {% if post.author == user and post.status != 2 %}
+      <form method="GET" action="{% url 'update_post' post.slug %}">
         {% csrf_token %}
-        {{ form.as_p }}
           <input type="submit" value="Update">
+      </form>
+      <form method="GET" action="{% url 'delete_post' post.slug %}">
+        {% csrf_token %}
+          <input type="submit" value="Delete">
       </form>
     {% endif %}
   </div>

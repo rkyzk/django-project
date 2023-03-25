@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic, View
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm, PostForm
 
@@ -120,7 +121,7 @@ class About(View):
 #             form.instance.author = self.request.user
 #             return super().form_valid(form)
 
-class AddStory(generic.CreateView):
+class AddStory(LoginRequiredMixin, generic.CreateView):
     model = Post
     template_name = "add_story.html"
     fields = ('title', 'content', 'featured_image', 'region', 'category')
@@ -129,16 +130,43 @@ class AddStory(generic.CreateView):
         form.instance.author = self.request.user
         if 'submit' in self.request.POST.keys():
             form.instance.status = 1
+            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
         else:
-            pass
+            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
         return super().form_valid(form)
 
-# messages.add_message(request, messages.SUCCESS, 'Your draft has been submitted.')
-# messages.add_message(request, messages.SUCCESS, 'Your draft has been saved.') 
 
-
-class UpdatePost(generic.UpdateView):
+class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     model = Post
+    template_name = "update_post.html"
+    fields = ('title', 'content', 'featured_image', 'region', 'category')
+    
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        if 'submit' in self.request.POST.keys():
+            form.instance.status = 1
+            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+        else:
+            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
+        return super().form_valid(form)
+    
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+
+class DeletePost(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    model = Post
+    template_name = "confirm_delete.html"
+    success_url = '/'
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
 
 class Search(View):
