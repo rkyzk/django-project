@@ -14,6 +14,15 @@ class PostList(generic.ListView):
     paginate_by = 3
 
 
+class PostMoreStories(generic.ListView):
+    model = Post
+    queryset = Post.objects.filter(status=2).order_by("-created_on")
+    # datetime
+    # posts_this_week = [post in queryset if post.updated_on 
+    template_name = "more_stories.html"
+    paginate_by = 6
+
+
 class PostDetail(View):
     def get(self, request, slug, *args, **kwargs):
         post = Post.objects.filter(slug=slug)[0]

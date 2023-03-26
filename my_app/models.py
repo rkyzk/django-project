@@ -67,6 +67,10 @@ class Post(models.Model):
     
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'slug': self.slug})
+    
+    def excerpt(self):
+        excerpt = str(self.content)[0:99] + "..."
+        return excerpt
 
 
 class Comment(models.Model):

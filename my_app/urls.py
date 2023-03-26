@@ -11,5 +11,6 @@ urlpatterns = [
     path('like/<slug:slug>', views.PostLike.as_view(), name='post_like'),
     path('bookmark/<slug:slug>', views.Bookmark.as_view(), name='bookmark'),
     path('<slug:slug>/update', views.UpdatePost.as_view(), name='update_post'),
-    path('<slug:slug>/delete', views.DeletePost.as_view(), name='delete_post')
+    path('<slug:slug>/delete', views.DeletePost.as_view(), name='delete_post'),
+    path('more_stories', views.PostMoreStories.as_view(), name='more_stories')
 ]
