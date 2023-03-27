@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
-from .forms import CommentForm, PostForm
+from .forms import CommentForm, PostForm, PhotoForm
 
 
 class PostList(generic.ListView):
@@ -133,10 +133,13 @@ class About(View):
 class AddStory(LoginRequiredMixin, generic.CreateView):
     model = Post
     template_name = "add_story.html"
-    fields = ('title', 'content', 'featured_image', 'region', 'category')
+    fields = ('title', 'content', 'region', 'category')
     
     def form_valid(self, form):
         form.instance.author = self.request.user
+        image = self.request.POST.featured_image
+        print(type(image))
+
         if 'submit' in self.request.POST.keys():
             form.instance.status = 1
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')

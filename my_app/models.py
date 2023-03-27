@@ -30,14 +30,19 @@ REGION = (('N/A', 'N/A'),
           ('ANZ', 'Australia and New Zealand'),
           ('PIS', 'Pacific Islands'))
 
-CATEGORY = (('others', 'others'),)
+CATEGORY = (('saving animals', 'Saving animals'),
+            ('saving aquatic system', 'Saving aquatic system'),
+            ('saving soil & trees', 'Saving soil & trees'),
+            ('saving resources', 'Saving resources'),
+            ('eco-conscious diet', 'eco-conscious diet'),
+            ('others', 'Others'))
 
 
 class Post(models.Model):
     title = models.CharField(max_length=80, unique=True)
     slug = models.SlugField(max_length=80, unique=True)
-    author = models.ForeignKey(User, on_delete=models.SET_DEFAULT,
-                               default=1, related_name="posts")
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name="posts")
     featured_flag = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
@@ -47,17 +52,18 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name='post_likes', blank=True)
     region = models.CharField(max_length=30, choices=REGION, default='N/A')
     category = models.CharField(max_length=30, choices=CATEGORY,
-                                default='others')
+                                default='Others')
     bookmark = models.ManyToManyField(User, related_name='bookmarked',
                                       blank=True)
+
+
+    class Meta:
+        ordering = ['-created_on']
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ['-created_on']
 
     def __str__(self):
         return self.title
@@ -76,6 +82,7 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
                              related_name='comments')
+    # commenter
     name = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name="comment_writer")
     body = models.TextField()
@@ -87,3 +94,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment: {self.body} by {self.name.username}"
+
+
+class Photo(models.Model):
+   image = CloudinaryField('image')

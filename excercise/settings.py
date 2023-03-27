@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'django_summernote',
     'crispy_forms',
-    'my_app'
+    'my_app',
+    'users'
 ]
 
 
@@ -169,3 +170,5 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
