@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
-from .forms import CommentForm, PostForm
+from .forms import CommentForm, PostForm, PhotoForm
 
 
 class PostList(generic.ListView):
@@ -135,15 +135,27 @@ class AddStory(LoginRequiredMixin, generic.CreateView):
     template_name = "add_story.html"
     fields = ('title', 'content', 'region', 'category')
     
-    def form_valid(self, form):
-        form.instance.author = self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super(AddStory, self).get_context_data(**kwargs)
+        context['post_form'] = PostForm()
+        context['photo_form'] = PhotoForm()
+        return context
+
+
+    def form_valid(self, form, **kwargs):
+        post_form = PostForm(self.request.POST)
+        post_form.instance.author = self.request.user
+
+        photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        post_form.instance.featured_image = photo_form
 
         if 'submit' in self.request.POST.keys():
-            form.instance.status = 1
+            post_form.instance.status = 1
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
         else:
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-        return super().form_valid(form)
+        return super().form_valid(post_form)
 
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
