@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
-from .forms import CommentForm, PostForm, PhotoForm
+from .forms import CommentForm, PostForm
 
 
 class PostList(generic.ListView):
@@ -133,25 +133,25 @@ class About(View):
 class AddStory(LoginRequiredMixin, generic.CreateView):
     model = Post
     template_name = "add_story.html"
-    fields = ('title', 'content', 'region', 'category')
+    fields = ('title', 'content', 'featured_image', 'region', 'category')
     
 
-    def get_context_data(self, **kwargs):
-        context = super(AddStory, self).get_context_data(**kwargs)
-        context['post_form'] = PostForm()
-        context['photo_form'] = PhotoForm()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(AddStory, self).get_context_data(**kwargs)
+    #     context['post_form'] = PostForm()
+    #     context['photo_form'] = PhotoForm()
+    #     return context
 
 
     def form_valid(self, form, **kwargs):
-        post_form = PostForm(self.request.POST)
-        post_form.instance.author = self.request.user
+        form = form(self.request.POST)
+        form.instance.author = self.request.user
 
-        photo_form = PhotoForm(self.request.POST, self.request.FILES)
-        post_form.instance.featured_image = photo_form
+        # photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        # post_form.instance.featured_image = photo_form
 
         if 'submit' in self.request.POST.keys():
-            post_form.instance.status = 1
+            form.instance.status = 1
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
         else:
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 

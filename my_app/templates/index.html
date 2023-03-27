@@ -30,7 +30,7 @@
           {% if "placeholder" in post.featured_image.url %}
             <img class="card-img-top" src="" alt="woods">
           {% else %}
-            <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+            <img class="card-img-top" src="{% post.featured_image.url %}" alt="{{ post.title }}">
           {% endif %}
           <div class="image-flash">
             <p class="author">Author: {{ post.author }}</p>
