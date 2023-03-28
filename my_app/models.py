@@ -96,5 +96,5 @@ class Comment(models.Model):
         return f"Comment: {self.body} by {self.name.username}"
 
 
-# class Photo(models.Model):
-#    image = CloudinaryField('image')
+class Photo(models.Model):
+    image = CloudinaryField('image')

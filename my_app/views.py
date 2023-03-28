@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
-from .forms import CommentForm, PostForm
+from .forms import CommentForm, PostForm, PhotoForm
 
 
 class PostList(generic.ListView):
@@ -130,32 +130,66 @@ class About(View):
 #             form.instance.author = self.request.user
 #             return super().form_valid(form)
 
-class AddStory(LoginRequiredMixin, generic.CreateView):
-    model = Post
-    template_name = "add_story.html"
-    fields = ('title', 'content', 'featured_image', 'region', 'category')
-    
+class AddStory(LoginRequiredMixin, View):
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(AddStory, self).get_context_data(**kwargs)
-    #     context['post_form'] = PostForm()
-    #     context['photo_form'] = PhotoForm()
-    #     return context
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            "add_story.html",
+            {
+                "post_form": PostForm(),
+                "photo_form": PhotoForm()
+            }
+        )
 
 
-    def form_valid(self, form, **kwargs):
-        form = form(self.request.POST)
-        form.instance.author = self.request.user
+        def post(self, request, slug, *args, **kwargs):
+        post = Post.objects.filter(slug=slug)[0]
+        comments = post.comments.filter(approved=True).order_by('created_on')
+        liked = False
+        if post.likes.filter(id=self.request.user.id).exists():
+            liked = True
+        bookmarked = False
+        if post.bookmark.filter(id=self.request.user.id).exists():
+            bookmarked = True
 
-        # photo_form = PhotoForm(self.request.POST, self.request.FILES)
-        # post_form.instance.featured_image = photo_form
+        comment_form = CommentForm(data=request.POST)
 
-        if 'submit' in self.request.POST.keys():
-            form.instance.status = 1
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+        if comment_form.is_valid():
+            comment_form.instance.email = request.user.email
+            comment_form.instance.name = request.user
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.save()
         else:
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-        return super().form_valid(post_form)
+            comment_form = CommentForm()
+        return render(
+            request,
+            "post_detail.html",
+            {
+                "post": post,
+                "comments": comments,
+                "commented": True,
+                "liked": liked,
+                "bookmarked": bookmarked,
+                "comment_form": CommentForm()
+            },
+        )
+
+
+    # def form_valid(self, form, **kwargs):
+    #     post_form = PostForm(self.request.POST)
+    #     post_form.instance.author = self.request.user
+
+    #     photo_form = PhotoForm(self.request.POST, self.request.FILES)
+    #     post_form.instance.featured_image = photo_form
+
+    #     if 'submit' in self.request.POST.keys():
+    #         form.instance.status = 1
+    #         messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+    #     else:
+    #         messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
+    #     return super().form_valid(post_form)
 
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
