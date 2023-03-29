@@ -17,7 +17,10 @@
     background-color: rgb(7, 78, 31);
   }
 
-
+  .card-img-small {
+    width: 150;
+    height: auto;
+  }
 
   /* .form-box {
     display: block;

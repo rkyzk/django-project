@@ -9,11 +9,11 @@
       <div class="col-md-4">
         <div class="image-container">
           {% if "placeholder" in post.featured_image.url %}
-            <img class="card-img-top" src="../media/placeholder.jpg">
+            <img class="card-img-top" src="../../media/placeholder.jpg">
           {% else %}
             <img class="card-img-top" src=" {{ post.featured_image.url }}">
           {% endif %}
-          <div class="image-flash">
+          <div>
             <p class="author">Author: {{ post.author }}</p>
             <strong><p>{{ post.title }}</p></strong>
             <p>{{ post.excerpt }}</p>

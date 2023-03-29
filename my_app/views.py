@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic, View
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+# UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
 
@@ -142,7 +143,6 @@ class AddStory(LoginRequiredMixin, View):
             }
         )
 
-
     def post(self, request, *args, **kwargs):
         post_form = PostForm(self.request.POST)
         post_form.instance.author = self.request.user
@@ -164,17 +164,61 @@ class AddStory(LoginRequiredMixin, View):
             "add_story.html",
             {
                 "post_form": PostForm(),
-                # "photo_form": PhotoForm()
+                "photo_form": PhotoForm()
             }
         )
 
 
+class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
 
-class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
-    model = Post
-    template_name = "update_post.html"
-    fields = ('title', 'content', 'featured_image', 'region', 'category')
-    
+    def get(self, request, slug, *args, **kwargs):
+        post = get_object_or_404(Post, slug=slug)
+        original_data = {
+                            "title": post.title,
+                            "content": post.content,
+                            "region": post.region,
+                            "category": post.category
+                        }
+        return render(
+            request,
+            "update_post.html",
+            {
+                "post_form": PostForm(initial=original_data),
+                "photo_form": PhotoForm(),
+                "post": post
+            }
+        )
+
+        def post(self, request, slug, *args, **kwargs):
+            post_form = PostForm(self.request.POST)
+            post_form.instance.author = self.request.user
+
+            if PhotoForm(self.request.POST, self.request.FILES):
+                photo_form = PhotoForm(self.request.POST, self.request.FILES)
+                photo = photo_form.save(commit=False)
+                post_form.instance.featured_image = photo.image
+            else:
+                post = post.get_object_or_404(POST, slug=slug)
+                post_form.instance.featured_image = post.featured_image
+
+            if 'submit' in self.request.POST.keys():
+                post_form.instance.status = 1
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+            else:
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
+            if post_form.is_valid():
+                post_form.save()
+                
+            return render(
+                request,
+                "add_story.html",
+                {
+                    "post_form": PostForm(),
+                    "photo_form": PhotoForm()
+                }
+            )
+
+
     def form_valid(self, form):
         form.instance.author = self.request.user
         if 'submit' in self.request.POST.keys():
@@ -184,14 +228,16 @@ class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
         return super().form_valid(form)
     
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
+    # def test_func(self):
+    #     post = self.get_object()
+    #     if self.request.user == post.author:
+    #         if post.status == 2:
+    #             messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
+    #         return True
+    #     return False
 
 
-class DeletePost(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
     model = Post
     template_name = "confirm_delete.html"
     success_url = '/'
@@ -223,7 +269,7 @@ class Search(View):
 
 class MyPage(View):
     def get(self, request, id, *args, **kwargs):
-        queryset = Post.objects.filter(author=id)
+        queryset = Post.objects.filter(author=id)  
         comments = Comment.objects.filter(name=id)
         commented_posts = [comment.post for comment in comments]
         # remove duplicates
