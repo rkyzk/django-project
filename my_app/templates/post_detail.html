@@ -16,7 +16,6 @@
     {% endif %}
   </div>
 </div>
-
 <div class="container">
   <div class="row">
     <p>
@@ -59,7 +58,7 @@
             <button type="submit" name="'blogpost_id" value="{{post.slug}}" class="btn">
               <i class="fa fa-bookmark-o" aria-hidden="true"></i>
             </button>
-            <p>Click to bookmark</p>
+            <p>Click to bookmark this post</p>
           {% endif %}           
         </form>
       {% endif %}
@@ -67,21 +66,25 @@
   </div>
   <div class="row">
     {% if post.author == user and post.status != 2 %}
+    <div class="col-md-1">
       <form method="GET" action="{% url 'update_post' post.slug %}">
         {% csrf_token %}
           <input type="submit" value="Update">
       </form>
+    </div>
+    <div class="col-md-1">
       <form method="GET" action="{% url 'delete_post' post.slug %}">
         {% csrf_token %}
           <input type="submit" value="Delete">
       </form>
+    </div>
     {% endif %}
   </div>
   {% if post.status == 2 %}
   <div class="row">
     <h3>Comments:</h3>
   </div>
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-md-7">
       {% for comment in comments %}
         <span>
@@ -103,7 +106,7 @@
         <form method="post" style="margin-top: 1.3em;">
           {{ comment_form | crispy }}
           {% csrf_token %}
-          <button type="submit" class="btn btn-signup btn-lg">Submit</button>
+          <button type="submit" class="btn-submit btn-lg mt-3">Submit</button>
         </form>
         {% else %}
         <p><a href="{% url 'account_signup' %}">Become a member</a> to leave comments.</p>

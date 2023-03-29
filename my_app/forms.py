@@ -24,6 +24,6 @@ class PhotoForm(forms.ModelForm):
     image = CloudinaryFileField( 
         options = { 
             'tags': "directly_uploaded",
-            'crop': 'fill_pad', 'width': 450, 'height': 300,
+            'crop': 'fill_pad', 'width': 510, 'height': 340,
             'gravity': 'auto'
         })

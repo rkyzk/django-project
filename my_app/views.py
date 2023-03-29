@@ -3,7 +3,7 @@ from django.views import generic, View
 from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment, Photo
+from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
 
 
@@ -149,7 +149,7 @@ class AddStory(LoginRequiredMixin, View):
 
         photo_form = PhotoForm(self.request.POST, self.request.FILES)
         photo = photo_form.save(commit=False)
-        post_form.instance.featured_image = photo 
+        post_form.instance.featured_image = photo.image
 
         if 'submit' in self.request.POST.keys():
             post_form.instance.status = 1
@@ -164,7 +164,7 @@ class AddStory(LoginRequiredMixin, View):
             "add_story.html",
             {
                 "post_form": PostForm(),
-                "photo_form": PhotoForm()
+                # "photo_form": PhotoForm()
             }
         )
 
