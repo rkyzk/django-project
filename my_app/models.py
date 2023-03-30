@@ -84,7 +84,7 @@ class Comment(models.Model):
                              related_name='comments')
     # commenter
     name = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="comment_writer")
+                             related_name="comment_writer") # commenter
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)

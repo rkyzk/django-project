@@ -87,20 +87,23 @@
   <div class="row mt-3">
     <div class="col-md-7">
       {% for comment in comments %}
+      <div>
         <span>
         {{ comment.name }}
         {{ comment.created_on }}
         </span>
         {{ comment.body | linebreaks }}
+        {% if comment.name == user %}
+          <form method="post">
+            <input name="edit" value="edit">
+            <input name="delete" value="delete">
+          </form>
+        {% endif %}
+      </div>  
       {% endfor %}
     </div>
     <div class="col-md-5">
-      {% if commented %}
-        <div class="alert alert-success" role="alert">
-          Your comment is awaiting approval
-        </div>
-      {% else %}
-        {% if user.is_authenticated %}
+      {% if user.is_authenticated %}
         <h3>Leave a comment:</h3>
         <p>Posting as: {{ user.username }}</p>
         <form method="post" style="margin-top: 1.3em;">
