@@ -100,9 +100,9 @@
               {% if comment.name == user %}
                 <!-- <input name="edit" value="edit"> -->
                 <!-- Button trigger delete confirmation modal -->
-                <button type="button" action="">
+                <a href="{% url 'confirm' comment.id %}">
                   Delete my comment
-                </button>
+                </a>
               </form>
             {% endif %}
           </div>  

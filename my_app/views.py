@@ -36,7 +36,6 @@ class PostDetail(View):
         if post.bookmark.filter(id=self.request.user.id).exists():
             bookmarked = True
 
-        print(comments[0].id)
         return render(
             request,
             "post_detail.html",
@@ -248,6 +247,17 @@ class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin,
         if self.request.user == post.author:
             return True
         return False
+
+
+class ConfirmDelete(View):
+    def get(self, request, id, *args, **kwargs):
+        return render(
+            request,
+            "delete_comment.html",
+            {
+                "comment_id": id
+            }
+        )   
 
 
 class DeleteComment(View):
