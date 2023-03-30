@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+<!-- intro -->
+<div class="container">
+  <div class="row">
+    <legend>Are you sure you want to delete your comment?</legend>
+    <form method="post" class="mt-3" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <button action="{% url 'post_detail'  %}">Cancel</button>
+      <button type="submit" class="btn-submit btn-lg mt-3 ml-5" name="submit" value="complete">Submit for approval</button> 
+    </form>
+  </div>
+</div>
+{% endblock content %}

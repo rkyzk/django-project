@@ -87,19 +87,26 @@
   <div class="row mt-3">
     <div class="col-md-7">
       {% for comment in comments %}
-      <div>
-        <span>
-        {{ comment.name }}
-        {{ comment.created_on }}
-        </span>
-        {{ comment.body | linebreaks }}
-        {% if comment.name == user %}
-          <form method="post">
-            <input name="edit" value="edit">
-            <input name="delete" value="delete">
-          </form>
-        {% endif %}
-      </div>  
+        {% if comment.comment_status == 2 %}
+          <p>Comment deleted</p>
+        {% else %}
+          <div>
+            <form method="post">
+              <span>
+                {{ comment.name }}
+                {{ comment.created_on }}
+              </span>
+              {{ comment.body | linebreaks }}
+              {% if comment.name == user %}
+                <!-- <input name="edit" value="edit"> -->
+                <!-- Button trigger delete confirmation modal -->
+                <button type="button" action="">
+                  Delete my comment
+                </button>
+              </form>
+            {% endif %}
+          </div>  
+          {% endif %}
       {% endfor %}
     </div>
     <div class="col-md-5">
@@ -113,12 +120,17 @@
         </form>
         {% else %}
         <p><a href="{% url 'account_signup' %}">Become a member</a> to leave comments.</p>
-        {% endif %}
       {% endif %}
+
     </div>
   </div>
   {% endif %}
 </div>
 {% endblock content %}
+<script>
+
+</script>
+
+
 <!-- {% url 'post_like' post.slug %} 
 {% url 'bookmark' post.slug %}-->

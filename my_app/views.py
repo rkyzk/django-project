@@ -36,6 +36,7 @@ class PostDetail(View):
         if post.bookmark.filter(id=self.request.user.id).exists():
             bookmarked = True
 
+        print(comments[0].id)
         return render(
             request,
             "post_detail.html",
@@ -248,6 +249,14 @@ class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin,
             return True
         return False
 
+
+class DeleteComment(View):
+
+    def post(self, request, id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=id)
+        comment.status = 2
+        slug = comment.post.slug
+        return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 class Search(View):
     def get(self, request, *args, **kwargs):

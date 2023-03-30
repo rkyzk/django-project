@@ -6,6 +6,7 @@ from cloudinary.models import CloudinaryField
 
 
 STATUS = ((0, "Draft"), (1, "Submitted"), (2, "Published"))
+COMMENT_STATUS = ((0, "original"), (1, "edited"), (2, "deleted"))
 
 REGION = (('N/A', 'N/A'),
           ('NAM', 'North Amrica'),
@@ -88,6 +89,7 @@ class Comment(models.Model):
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
     approved = models.BooleanField(default=False)
+    comment_status = models.IntegerField(choices=STATUS, default=0)
 
     class Meta:
         ordering = ['created_on']
