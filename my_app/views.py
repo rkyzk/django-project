@@ -6,6 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
+from datetime import timedelta
+from django.utils import timezone
 
 
 class PostList(generic.ListView):
@@ -17,11 +19,16 @@ class PostList(generic.ListView):
 
 class PostMoreStories(generic.ListView):
     model = Post
-    queryset = Post.objects.filter(status=2).order_by("-created_on")
-    # datetime
-    # posts_this_week = [post in queryset if post.updated_on 
     template_name = "more_stories.html"
     paginate_by = 6
+
+    def get_context_data(self, **kwargs):
+        context = super(PostMoreStories, self).get_context_data(**kwargs)
+        queryset = Post.objects.all() #   filter(status=2)  # filter by published_date
+        context['posts_this_week'] = queryset
+        return context
+
+# | created_on > timezone.now().date() - timedelta(days=7)
 
 
 class PostDetail(View):
@@ -243,8 +250,6 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
 #     fields = ['title', 'content', 'featured_image']
 
 
-
-
 class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
     model = Post
     template_name = "confirm_delete.html"
@@ -258,7 +263,6 @@ class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin,
         return False
 
 
-
 class DeleteComment(View):
 
     def post(self, request, id, *args, **kwargs):
@@ -266,6 +270,7 @@ class DeleteComment(View):
         comment.status = 2
         slug = comment.post.slug
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+
 
 class Search(View):
     def get(self, request, *args, **kwargs):
