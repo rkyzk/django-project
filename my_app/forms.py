@@ -4,12 +4,14 @@ from django import forms
 
 
 class CommentForm(forms.ModelForm):
+
     class Meta:
         model = Comment
         fields = ('body',)
 
 
 class PostForm(forms.ModelForm):
+
     class Meta:
         model = Post
         fields = ('title', 'content', 'region', 'category')
@@ -17,6 +19,11 @@ class PostForm(forms.ModelForm):
 
 class PhotoForm(forms.ModelForm):
     
+    def __init__(self, *args, **kwargs):
+        super(PhotoForm, self).__init__(*args, **kwargs)
+        self.fields['image'].required = False
+
+
     class Meta:
         model = Photo
         fields = ('image',)

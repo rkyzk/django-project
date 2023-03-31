@@ -7,7 +7,7 @@
     <div class="col-3 graphic-box-left">
 
     </div>
-    <div class="col-6">
+    <div class="col-6 mt-5">
       <p>Depressed about climate change?</p>
       <p>This website is for anyone who wants to find out what some local communities
          and individuals all over the world are doing to tackle the issue and/or 
@@ -42,7 +42,10 @@
       </div>
     {% endfor %}
   </div>
-  <a href="{% url 'more_stories' %}">Read more stories from this week.</p>
-  <a href="#">Read the most 'liked' stories of all time.</p>
-</div>
+  <div class="mt-3">
+    <a href="{% url 'more_stories' %}"><p class="links">Read more stories from this week</p></a>
+  </div>
+  <div class="mt-3">
+    <a href="#"><p class="links">Read the most 'liked' stories of all time.</p></a>
+  </div>
 {% endblock %}

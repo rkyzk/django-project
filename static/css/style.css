@@ -1,27 +1,35 @@
 .graphic-box-left {
-    height: auto;
-    background-color: bisque;
-  }
+  height: auto;
+  background-color: bisque;
+}
   
-  .graphic-box-right {
-    height: auto;
-    background-color: azure;
-  }
+.graphic-box-right {
+  height: auto;
+  background-color: azure;
+}
   
-  h1 {
-    text-align: center;
-  }
+h1 {
+  text-align: center;
+}
 
-  .btn-submit {
-    color: #fff;
-    background-color: rgb(7, 78, 31);
-  }
+.btn-submit {
+  color: #fff;
+  background-color: rgb(7, 78, 31);
+}
 
-  .card-img-small {
-    width: 150;
-    height: auto;
-  }
+.card-img-small {
+  width: 150;
+  height: auto;
+}
 
+a {
+  color:rgb(53, 20, 175)
+  list-style: none;
+}
+
+.links {
+  font-size: 1.5rem;
+}
   /* .form-box {
     display: block;
     width: 500px;
