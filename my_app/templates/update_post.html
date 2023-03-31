@@ -10,10 +10,6 @@
       {% csrf_token %}
       {{ post_form | crispy }}
       {{ photo_form | crispy }}
-      <figure>
-        <figcaption>Current image</figcaption>
-        <img class="card-img-small" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-      </figure>
       <button type="submit" class="btn-submit btn-lg mt-3" name="save" value="draft">Save</button>
       <button type="submit" class="btn-submit btn-lg mt-3 ml-5" name="submit" value="complete">Submit for approval</button> 
     </form>

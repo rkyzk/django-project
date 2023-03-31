@@ -47,6 +47,7 @@ class Post(models.Model):
     featured_flag = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    published_on = models.DateTimeField(null=True, blank=True)
     content = models.TextField()
     featured_image = CloudinaryField('image', default='placeholder')
     status = models.IntegerField(choices=STATUS, default=0)
@@ -99,4 +100,4 @@ class Comment(models.Model):
 
 
 class Photo(models.Model):
-    image = CloudinaryField('image')
+    image = CloudinaryField('image', blank=True)

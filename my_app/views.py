@@ -169,72 +169,76 @@ class AddStory(LoginRequiredMixin, View):
         )
 
 
-class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
+class UpdatePost(LoginRequiredMixin, View): 
 
-    def get(self, request, slug, *args, **kwargs):
-        post = get_object_or_404(Post, slug=slug)
-        original_data = {
-                            "title": post.title,
-                            "content": post.content,
-                            "region": post.region,
-                            "category": post.category
-                        }
-        return render(
-            request,
-            "update_post.html",
-            {
-                "post_form": PostForm(initial=original_data),
-                "photo_form": PhotoForm(),
-                "post": post
-            }
-        )
+# class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
 
-        def post(self, request, slug, *args, **kwargs):
-            post_form = PostForm(self.request.POST)
-            post_form.instance.author = self.request.user
+#     def get(self, request, slug, *args, **kwargs):
+#         post = get_object_or_404(Post, slug=slug)
+#         original_data = {
+#                             "title": post.title,
+#                             "content": post.content,
+#                             "region": post.region,
+#                             "category": post.category
+#                         }
+#         print(type(post.featured_image))
+#         original_photo = PhotoForm(post.featured_image)
+#         return render(
+#             request,
+#             "update_post.html",
+#             {
+#                 "post_form": PostForm(initial=original_data),
+#                 "photo_form": original_photo,
+#                 "post": post
+#             }
+#         )
 
-            if PhotoForm(self.request.POST, self.request.FILES):
-                photo_form = PhotoForm(self.request.POST, self.request.FILES)
-                photo = photo_form.save(commit=False)
-                post_form.instance.featured_image = photo.image
-            else:
-                post = post.get_object_or_404(POST, slug=slug)
-                post_form.instance.featured_image = post.featured_image
+#         def post(self, request, slug, *args, **kwargs):
+#             post_form = PostForm(self.request.POST)
+#             post_form.instance.author = self.request.user
 
-            if 'submit' in self.request.POST.keys():
-                post_form.instance.status = 1
-                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
-            else:
-                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-            if post_form.is_valid():
-                post_form.save()
+#             if PhotoForm(self.request.POST, self.request.FILES):
+#                 photo_form = PhotoForm(self.request.POST, self.request.FILES)
+#                 photo = photo_form.save(commit=False)
+#                 post_form.instance.featured_image = photo.image
+#             else:
+#                 post = post.get_object_or_404(POST, slug=slug)
+#                 post_form.instance.featured_image = post.featured_image
+
+#             if 'submit' in self.request.POST.keys():
+#                 post_form.instance.status = 1
+#                 messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+#             else:
+#                 messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
+#             if post_form.is_valid():
+#                 post_form.save()
                 
-            return render(
-                request,
-                "add_story.html",
-                {
-                    "post_form": PostForm(),
-                    "photo_form": PhotoForm()
-                }
-            )
+#             return render(
+#                 request,
+#                 "add_story.html",
+#                 {
+#                     "post_form": PostForm(),
+#                     "photo_form": PhotoForm()
+#                 }
+#             )
 
 
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        if 'submit' in self.request.POST.keys():
-            form.instance.status = 1
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
-        else:
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-        return super().form_valid(form)
+#     def form_valid(self, form):
+#         form.instance.author = self.request.user
+#         if 'submit' in self.request.POST.keys():
+#             form.instance.status = 1
+#             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+#         else:
+#             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
+#         return super().form_valid(form)
     
-    # def test_func(self):
-    #     post = self.get_object()
-    #     if self.request.user == post.author:
-    #         if post.status == 2:
-    #             messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
-    #         return True
-    #     return False
+#     # def test_func(self):
+#     #     post = self.get_object()
+#     #     if self.request.user == post.author:
+#     #         if post.status == 2:
+#     #             messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
+#     #         return True
+#     #     return False
 
 
 class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
@@ -249,15 +253,15 @@ class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin,
         return False
 
 
-class ConfirmDelete(View):
-    def get(self, request, id, *args, **kwargs):
-        return render(
-            request,
-            "delete_comment.html",
-            {
-                "comment_id": id
-            }
-        )   
+# class ConfirmDelete(View):
+#     def get(self, request, id, *args, **kwargs):
+#         return render(
+#             request,
+#             "delete_comment.html",
+#             {
+#                 "comment_id": id
+#             }
+#         )   
 
 
 class DeleteComment(View):
