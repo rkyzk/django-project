@@ -152,24 +152,20 @@ class AddStory(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         post_form = PostForm(self.request.POST)
-        post_form.instance.author = self.request.user
-
         photo_form = PhotoForm(self.request.POST, self.request.FILES)
-            # if photo_form not None:
-            #     photo = photo_form.save(commit=False)
-            #     post_form.instance.featured_image = photo.image
-            # else:
-            #     post = get_object_or_404(Post, slug==slug)
-            #     post_form.instance.featured_image = post.featured_image
-
-        if 'submit' in self.request.POST.keys():
-            post_form.instance.status = 1
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+        if post_form.is_valid() and photo_form.is_valid():
+            post_form.instance.author = self.request.user
+            photo = photo_form.save(commit=False)
+            post_form.instance.featured_image = photo.image
+            if 'submit' in self.request.POST.keys():
+                post_form.instance.status = 1
+                post_form.save()
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+            else:
+                post_form.save()
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')    
         else:
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-        if post_form.is_valid():
-            post_form.save()
-            
+            pass
         return render(
             request,
             "add_story.html",
@@ -201,38 +197,29 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
             }
         )
 
+
     def post(self, request, slug, *args, **kwargs):
         post_form = PostForm(self.request.POST)
-        post_form.instance.author = self.request.user
-       
         photo_form = PhotoForm(self.request.POST, self.request.FILES)
-        print(photo_form)
-        # photo = photo_form.save(commit=False)
-        # post_form.instance.featured_image.url = photo.image.url
+        post = get_object_or_404(Post, slug=slug)
 
-        # # else:
-        # #     post = post.get_object_or_404(POST, slug=slug)
-        # #     post_form.instance.featured_image = post.featured_image
-
+        if post_form.is_valid() and photo_form.is_valid():
+            post_form.instance.author = self.request.user
+            photo = photo_form.save(commit=False)
+            
+            # if photo.image:
+            #     post_form.instance.featured_image = photo.image
+            # else:
+            #     post_form.instance.featured_image = 
         if 'submit' in self.request.POST.keys():
             post_form.instance.status = 1
             messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
         else:
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-        if post_form.is_valid():
-            post_form.save()
+            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')
+        post_form.save()
             
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
-
-    # def form_valid(self, form):
-    #     form.instance.author = self.request.user
-    #     if 'submit' in self.request.POST.keys():
-    #         form.instance.status = 1
-    #         messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
-    #     else:
-    #         messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.') 
-    #     return super().form_valid(form)
     
     # def test_func(self):
     #     post = self.get_object()
@@ -255,17 +242,27 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
 #     fields = ['title', 'content', 'featured_image']
 
 
-class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
-    model = Post
-    template_name = "confirm_delete.html"
-    success_url = '/'
+# class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
+#     model = Post
+#     template_name = "confirm_delete.html"
+#     success_url = '/'
 
 
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
+#     def test_func(self):
+#         post = self.get_object()
+#         if self.request.user == post.author:
+#             return True
+#         return False
+
+class DeletePost(View):
+
+    def post(self, request, slug, *args, **kwargs):
+        post = get_object_or_404(Post, slug=slug)
+        post.delete()
+        return HttpResponseRedirect(reverse('/'))
+
+
+
 
 
 class DeleteComment(View):
