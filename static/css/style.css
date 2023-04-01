@@ -23,8 +23,8 @@ h1 {
 }
 
 a {
-  color:rgb(53, 20, 175)
-  list-style: none;
+  color:rgb(53, 20, 175);
+  text-decoration: none;
 }
 
 .links {

@@ -32,5 +32,6 @@ class PhotoForm(forms.ModelForm):
         options = { 
             'tags': "directly_uploaded",
             'crop': 'fill_pad', 'width': 510, 'height': 340,
-            'gravity': 'auto'
+            'gravity': 'auto',
+            'q_auto': 'good'
         })

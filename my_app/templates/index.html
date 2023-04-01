@@ -28,7 +28,7 @@
       <div class="col-md-4">
         <div class="image-container">
           {% if "placeholder" in post.featured_image.url %}
-            <img class="card-img-top" src="" alt="woods">
+            <img class="card-img-top" src="{{ default_img.jpg }} " alt="woods">
           {% else %}
             <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
           {% endif %}
@@ -42,7 +42,8 @@
       </div>
     {% endfor %}
   </div>
-  <div class="mt-3">
+  <hr />
+  <div class="mt-5">
     <a href="{% url 'more_stories' %}"><p class="links">Read more stories from this week &raquo;</p></a>
   </div>
   <div class="mt-3">

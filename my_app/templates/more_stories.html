@@ -18,15 +18,17 @@
             <strong><p>{{ post.title }}</p></strong>
             <p>{{ post.excerpt }}</p>
             <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
+            <hr />
+            <p>{{ post.creted_on }}<i class="far fa-heart"></i>{{ post.number_of_likes }}</p>
           </div>
         </div>
       </div>
       {% if forloop.counter|divisibleby:3 %}
-  </div>
-  <div class="row">
-    {% endif %}
+    </div>
+    <div class="row">
+      {% endif %}
     {% empty %}
-    <p>We have no more stories.</p>
+      <p>We have no more stories.</p>
     {% endfor %}
   </div>
   {% if is_paginated %}
@@ -40,6 +42,6 @@
         {% endif %}
       </ul>
     </nav>
-{% endif %}
+  {% endif %}
 </div>
 {% endblock %}

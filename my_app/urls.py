@@ -1,5 +1,7 @@
 from . import views
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.PostList.as_view(), name='home'),
@@ -15,3 +17,6 @@ urlpatterns = [
     path('more_stories', views.PostMoreStories.as_view(), name='more_stories'),
     path('<int:id>/delete_comment', views.DeleteComment.as_view(), name='delete_comment')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

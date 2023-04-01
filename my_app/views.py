@@ -155,8 +155,12 @@ class AddStory(LoginRequiredMixin, View):
         post_form.instance.author = self.request.user
 
         photo_form = PhotoForm(self.request.POST, self.request.FILES)
-        photo = photo_form.save(commit=False)
-        post_form.instance.featured_image = photo.image
+            # if photo_form not None:
+            #     photo = photo_form.save(commit=False)
+            #     post_form.instance.featured_image = photo.image
+            # else:
+            #     post = get_object_or_404(Post, slug==slug)
+            #     post_form.instance.featured_image = post.featured_image
 
         if 'submit' in self.request.POST.keys():
             post_form.instance.status = 1
@@ -201,7 +205,8 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
         post_form = PostForm(self.request.POST)
         post_form.instance.author = self.request.user
        
-        # photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        print(photo_form)
         # photo = photo_form.save(commit=False)
         # post_form.instance.featured_image.url = photo.image.url
 
