@@ -6,8 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
-from datetime import timedelta
-from django.utils import timezone
+from datetime import datetime, timedelta
 
 
 class PostList(generic.ListView):
@@ -19,14 +18,20 @@ class PostList(generic.ListView):
 
 class PostMoreStories(generic.ListView):
     model = Post
+    queryset = Post.objects.filter(status=2).order_by("-created_on")
     template_name = "more_stories.html"
-    paginate_by = 6
 
-    def get_context_data(self, **kwargs):
-        context = super(PostMoreStories, self).get_context_data(**kwargs)
-        queryset = Post.objects.filter(status=2)
-        context['posts_this_week'] = queryset
-        return context
+
+    # model = Post
+    # template_name = "more_stories.html"
+    # paginate_by = 6
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(PostMoreStories, self).get_context_data(**kwargs)
+    #     queryset = []   # Post.objects.all()
+    #     # (published_on > (datetime.now() - timedelta(days=7)).date())
+    #     context['posts_this_week'] = queryset
+    #     return context
 
 
 class PostDetail(View):

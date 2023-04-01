@@ -91,38 +91,30 @@
     <hr />
 
     <div class="row">
-      <ul>
         {% if queryset %}
         {% for post in queryset %}
-          <li>
+        <div class="col-md-4">
+          <div class="image-container">
             {{ post.title }}
             <span>Author: {{ post.author.name }}</span>
             <div class="image-container">
               {% if "placeholder" in post.featured_image.url %}
-              <img class="card-img-top"
-                  src="https://codeinstitute.s3.amazonaws.com/fullstack/blog/default.jpg" width="40%">
+                <img class="card-img-top" src="media/default.jpg" width="100%">
               {% else %}
-              <img class="card-img-top" src=" {{ post.featured_image.url }}" width="40%">
+                <img class="card-img-top" src=" {{ post.featured_image.url }}" width="100%">
               {% endif %}
-              <div class="image-flash">
-                  <p class="author">Author: {{ post.author }}</p>
-              </div>
-          </div>
-            <!-- <span>
-              {% for cat in journal.categories.all %}
-                {{ cat }}
-              {% endfor %}
-            </span> -->
-            <!-- <span>Publish date: {{ journ.publish_date }}</span>
-            <span>View count: {{ journal.views }}</span>
-            <span>Reviewed: {{ journal.reviewed }}</span> -->
-          </li>
-          <hr />
+              <p class="author">Author: {{ post.author }}</p>
+            </div>
+        </div>    
+      </div>
+        {% if forloop.counter|divisibleby:3 %}
+      <hr />
+    </div>
+    <div class="row">
+        {% endif %}
         {% endfor %}
         {% endif %}
-      </ul>
     </div>
-
   </main>
 
 {%endblock%}
