@@ -97,10 +97,31 @@
             </span>
               {{ comment.body | linebreaks }}
               {% if comment.name == user %}
-                <form method="get" action="{% url 'update_comment' comment.id %}" class="mt-3">
-                  {% csrf_token %}
-                  <input name="edit" value="Update">
-                </form>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">
+                <i>icon</i>
+              </button>
+
+              <!-- Modal -->
+              <div class="modal" id="updateModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Update comment</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      
+                    </div>
+                    <div class="modal-footer">    
+                        <a class="btn btn-primary" href="">Update</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                
                 <!-- When 'Delete' button is clicked, confirm if the user wants to delete the comment -->
                 <a href="{% url 'delete_comment' comment.id %}" class="mt-3">
                   delete</a>
@@ -130,6 +151,28 @@
   {% endif %}
 </div>
 {% endblock content %}
+<script>
+$(document).ready(function(){
+  $("#updateModal").click(function(){
+    var pk = $(this).data('comment.id')
+    $("#myModal").modal("show");
+  });
+  $("#myModal").on('show.bs.modal', function(event){
+    var modal = $(this)
+    var pk = $(this).data('pid')
+    $.ajax({
+        data: {'pk': pk},
+        url: "{% url 'search:load_paper' %}",
+        context: document.body,
+        error: function(response, error) {
+            alert(error);
+        }
+    }).done(function(response) {
+        modal.html(response);
+    });
+  });
+});
+</script>
 
 
 
