@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from .models import Post, Comment
 from django_summernote.admin import SummernoteModelAdmin
-
+from datetime import datetime
 
 @admin.register(Post)
 class PostAdmin(SummernoteModelAdmin):
@@ -12,11 +12,11 @@ class PostAdmin(SummernoteModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_filter = ('status', 'created_on')
     summernote_fields = ('content',)
-    actions = ['publish_posts'] 
+    actions = ['publish_posts']
 
     def publish_posts(self, request, queryset):
-        queryset.update(status='2')
-        queryset.update(published_on=models.DateTimeField(auto_now_add=True))
+        queryset.update(status=2)
+        queryset.update(published_on=datetime.utcnow())
 
 
 @admin.register(Comment)

@@ -24,16 +24,14 @@ class PostMoreStories(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(PostMoreStories, self).get_context_data(**kwargs)
-        queryset = Post.objects.all() #   filter(status=2)  # filter by published_date
+        queryset = Post.objects.filter(status=2)
         context['posts_this_week'] = queryset
         return context
-
-# | created_on > now().date() - timedelta(days=7)
 
 
 class PostDetail(View):
     def get(self, request, slug, *args, **kwargs):
-        post = Post.objects.filter(slug=slug)[0]
+        post = get_object_or_404(Post, slug=slug)
         comments = post.comments.filter(approved=True).order_by('created_on')
         liked = False
         if post.likes.filter(id=self.request.user.id).exists():
@@ -164,32 +162,44 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
             "update_post.html",
             {
                 "post_form": PostForm(initial=original_data),
-                "photo_form": PhotoForm(),
+                # "photo_form": PhotoForm(initial=post.featured_image),
                 "post": post
             }
         )
 
 
     def post(self, request, slug, *args, **kwargs):
-        post_form = PostForm(self.request.POST)
-        photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        
+        # photo_form = PhotoForm(self.request.POST, self.request.FILES)
         post = get_object_or_404(Post, slug=slug)
+        post_form = PostForm(self.request.POST, instance=post)
+        # # if photo_form.is_valid():
+        #     photo = photo_form.cleaned_data['image']
+        #     pass
 
-        if post_form.is_valid() and photo_form.is_valid():
-            post_form.instance.author = self.request.user
-            photo = photo_form.save(commit=False)
-            
+        post_form.instance.author = self.request.user
+        if 'submit' in self.request.POST.keys():
+            post_form.instance.status = 1
+            message = 'Your draft has been submitted.'
+        else:
+            message = 'Your draft has been saved.'
+        if post_form.is_valid():
+            # post_form.instance.featured_image = photo
+            # photo = photo_form.save(commit=False)        
             # if photo.image:
             #     post_form.instance.featured_image = photo.image
             # else:
-            #     post_form.instance.featured_image = 
-        if 'submit' in self.request.POST.keys():
-            post_form.instance.status = 1
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+            #     post_form.instance.featured_image
+
+            post_form.save()
+            messages.add_message(self.request, messages.SUCCESS, message)    
         else:
-            messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')
-        post_form.save()
+            print ("error occured")
+            print ("non",post_form.non_field_errors())
             
+            field_errors = [ (field.label, field.errors) for field in post_form]
+            print ("field", field_errors)
+            print (post_form.errors)
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
     
@@ -236,12 +246,30 @@ class DeletePost(View):
         return HttpResponseRedirect(reverse('home'))
 
 
+class UpdateComment(View):
+
+      def get(self, request, id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=id)
+        form = CommentForm(instnace=comment)
+        return HTTPResponse(form.as_p())
+
+
+#     def post(self, request, id, *args, **kwargs):
+#         
+#         comment.status = 2
+#         slug = comment.post.slug
+#         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+
+
 class DeleteComment(View):
 
     def post(self, request, id, *args, **kwargs):
         comment = get_object_or_404(Comment, id=id)
-        comment.status = 2
+        comment.comment_status = 2
+        print(comment.body)
+        print(comment.comment_status)
         slug = comment.post.slug
+        comment.save()
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
@@ -254,7 +282,6 @@ class Search(View):
         title_contains_query = request.POST.get('title_contains')
         title_exact_query = request.GET.get('title_exact')
         title_or_author_query = request.GET.get('title_or_author')
-        print(title_contains_query)
         if title_contains_query != '' and title_contains_query is not None:
             qs = qs.filter(title__icontains=title_contains_query)
         context = {

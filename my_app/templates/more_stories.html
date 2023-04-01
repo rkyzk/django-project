@@ -5,11 +5,11 @@
 <div class="container my-3"> 
   <h2>More Stories from this week</h2>
   <div class="row">
-    {% for post in posts_this_week %}  <!-- post_list !?? -->
+    {% for post in posts_this_week %}
       <div class="col-md-4">
         <div class="image-container">
           {% if "placeholder" in post.featured_image.url %}
-            <img class="card-img-top" src="../media/placeholder.jpg" alt="woods">
+            <img class="card-img-top" src="{{}}" alt="graphic of woods">
           {% else %}
             <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
           {% endif %}

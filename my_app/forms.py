@@ -14,19 +14,19 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'content', 'region', 'category')
+        fields = ('title', 'content', 'region', 'category', 'featured_image')
 
 
 class PhotoForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(PhotoForm, self).__init__(*args, **kwargs)
-        self.fields['image'].required = False
+        self.fields['featured_image'].required = False
 
 
     class Meta:
-        model = Photo
-        fields = ('image',)
+        model = Post
+        fields = ('featured_image',)
     
     image = CloudinaryFileField( 
         options = { 

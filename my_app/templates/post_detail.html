@@ -8,20 +8,22 @@
     <h1>{{ post.title }}</h1>
     <p>{{ post.author }} | {{ post.created_on }}</p>
   </div>
-  <div>
-    {% if "placeholder" in post.featured_image.url %}
-      <img src="../media/placeholder.jpg" width="70%">
-    {% else %}
-      <img src=" {{ post.featured_image.url }}" width="70%">
-    {% endif %}
+  <div class="row">
+    <div class="col-md-5">
+      {% if "placeholder" in post.featured_image.url %}
+        <img src="media/default.jpg" width="100%">
+      {% else %}
+        <img src="{{ post.featured_image.url }}" width="100%">
+      {% endif %}
+    </div>
+    <div class="col-md-7">
+      <p>
+        {{ post.content | safe }}
+      </p>
+    </div>
   </div>
 </div>
 <div class="container">
-  <div class="row">
-    <p>
-      {{ post.content | safe }}
-    </p>
-  </div>
   <div class="row">
     <div class="col-1">
       <strong>
@@ -69,19 +71,19 @@
     <div class="col-md-1">
       <form method="GET" action="{% url 'update_post' post.slug %}">
         {% csrf_token %}
-          <input type="submit" value="Update">
+          <input class="btn btn-submit"type="submit" value="Update">
       </form>
     </div>
     <div class="col-md-1">
       <form method="POST" action="{% url 'delete_post' post.slug %}">
         {% csrf_token %}
-          <button type="submit" class="btn btn-submit" class="delete-post">Delete</button>
+        <button type="submit" class="btn btn-submit" class="delete-post">Delete</button>
       </form>
     </div>
     {% endif %}
   </div>
   {% if post.status == 2 %}
-  <div class="row">
+  <div class="row mt-5">
     <h3>Comments:</h3>
   </div>
   <div class="row mt-3">
@@ -92,16 +94,19 @@
         {% else %}
           <div>
             <span>
-              {{ comment.name }}
-              {{ comment.created_on }}
+              {% if comment.comment_status == 1 %}
+                <p>edited</p>
+              {% endif %}
+                {{ comment.name }}
+                {{ comment.created_on }}
             </span>
               {{ comment.body | linebreaks }}
               {% if comment.name == user %}
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">
+              <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateModal">
                 <i>icon</i>
               </button>
 
-              <!-- Modal -->
+               Modal
               <div class="modal" id="updateModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
@@ -120,11 +125,13 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
                 
                 <!-- When 'Delete' button is clicked, confirm if the user wants to delete the comment -->
-                <a href="{% url 'delete_comment' comment.id %}" class="mt-3">
-                  delete</a>
+                <form method="Post" action="{% url 'delete_comment' comment.id %}" class="mt-3">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm">Delete</button>
+                </form>
               {% endif %}
           </div>  
           {% endif %}

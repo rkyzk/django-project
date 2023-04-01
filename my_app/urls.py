@@ -15,6 +15,7 @@ urlpatterns = [
     path('<slug:slug>/update/', views.UpdatePost.as_view(), name='update_post'),
     path('<slug:slug>/delete/', views.DeletePost.as_view(), name='delete_post'),
     path('more_stories/', views.PostMoreStories.as_view(), name='more_stories'),
+   #  path('<int:id>/update_comment/', views.UpdateComment.as_view(), name='update_comment'),
     path('<int:id>/delete_comment/', views.DeleteComment.as_view(), name='delete_comment')
 ]
 
