@@ -28,7 +28,7 @@ class PostMoreStories(generic.ListView):
         context['posts_this_week'] = queryset
         return context
 
-# | created_on > timezone.now().date() - timedelta(days=7)
+# | created_on > now().date() - timedelta(days=7)
 
 
 class PostDetail(View):
@@ -109,34 +109,6 @@ class About(View):
             {}
         )
 
-
-# class AddStory(View):
-#     def get(self, request, *args, **kwargs):
-#         post_form = PostForm()
-#         return render(
-#             request,
-#             "add_story.html",
-#             {
-#                 "post_form": post_form,
-#             }
-#         )
-
-#     def post(self, request, *args, **kwargs):
-#         post_form = PostForm(data=request.POST)
-#         post = post_form.save(commit=False)
-#         if post_form.is_valid():
-#             if 'save' in request.POST:
-#                 post.status = 0
-#                 messages.add_message(request, messages.SUCCESS, 'Your draft was saved.')
-#             else:
-#                 post.status = 1
-#                 messages.add_message(request, messages.SUCCESS, 'Your draft was submitted.')
-#             post.save()  
-#         return render(request, "add_story.html", {'post_form': PostForm()})
-
-        # def form_valid(self, form):
-        #     form.instance.author = self.request.user
-        #     return super().form_valid(form)
 
 class AddStory(LoginRequiredMixin, View):
 
@@ -254,15 +226,14 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
 #             return True
 #         return False
 
+
 class DeletePost(View):
 
     def post(self, request, slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=slug)
         post.delete()
-        return HttpResponseRedirect(reverse('/'))
-
-
-
+        messages.add_message(self.request, messages.SUCCESS, 'Your draft has been deleted.')
+        return HttpResponseRedirect(reverse('home'))
 
 
 class DeleteComment(View):

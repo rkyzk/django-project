@@ -80,6 +80,10 @@ class Post(models.Model):
         excerpt = str(self.content)[0:99] + "..."
         return excerpt
 
+    def pub_date(self):
+        pub_date = self.created_on.strftime("%m/%d/%Y")
+        return pub_date
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,

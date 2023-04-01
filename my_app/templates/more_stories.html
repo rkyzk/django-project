@@ -13,19 +13,19 @@
           {% else %}
             <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
           {% endif %}
-          <div class="image-flash">
-            <p class="author">Author: {{ post.author }}</p>
+          <div>
+            <p>By {{ post.author }} | published on {{ post.pub_date }}</p>
             <strong><p>{{ post.title }}</p></strong>
             <p>{{ post.excerpt }}</p>
             <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
             <hr />
-            <p>{{ post.creted_on }}<i class="far fa-heart"></i>{{ post.number_of_likes }}</p>
+            <p></p><i class="far fa-heart"></i><span>{{ post.number_of_likes }}</span></p>
           </div>
         </div>
       </div>
       {% if forloop.counter|divisibleby:3 %}
-    </div>
-    <div class="row">
+  </div>
+  <div class="row">
       {% endif %}
     {% empty %}
       <p>We have no more stories.</p>
