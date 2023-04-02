@@ -9,7 +9,7 @@ STATUS = ((0, "Draft"), (1, "Submitted"), (2, "Published"))
 COMMENT_STATUS = ((0, "original"), (1, "edited"), (2, "deleted"))
 
 REGION = (('N/A', 'N/A'),
-          ('NAM', 'North Amrica'),
+          ('NAM', 'North America'),
           ('CAM', 'Central America'),
           ('CRB', 'Caribbean'),
           ('SAM', 'South America'),

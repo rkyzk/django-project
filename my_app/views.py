@@ -285,9 +285,12 @@ class Search(View):
         categories = [cat[1] for cat in category_choices]
         region_choices = Post._meta.get_field('region').choices
         regions = [region[1] for region in region_choices]
+
+        category = request.GET.get('category')
+        
         context = {
             "categories": categories,
-            "regions": regions
+            "regions": regions,
         }
         return render(request, "search.html", context)
 
@@ -302,6 +305,9 @@ class Search(View):
         liked_count_min_query = request.POST.get('liked_count_min')
         pub_date_min_query = request.POST.get('date_min')
         pub_date_max_query = request.POST.get('date_max')
+        
+        category = request.POST.get('category')
+        region = request.POST.get('region')
 
         if title_contains_query != '' and title_contains_query is not None:
             qs = posts.filter(title__icontains=title_contains_query)
@@ -326,14 +332,18 @@ class Search(View):
             print(min_date)
             # qs = posts.filter(published_on >= min_date)
             # print(qs)
-        #else:
 
         elif liked_count_min_query:
             qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
-        
+
+        elif region != 'Choose...':
+            qs = [post for post in posts if post.get_region_display() == region]
+        elif category != 'Choose...':
+            qs = [post for post in posts if post.get_category_display() == category]
         # if qs = []:
            # no_posts = "No posts found"
-            
+        else:
+            qs = []
         context = {
             'queryset': qs,
             # 'no_posts': no_posts
