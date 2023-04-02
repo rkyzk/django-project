@@ -4,7 +4,6 @@ from django import forms
 
 
 class CommentForm(forms.ModelForm):
-
     class Meta:
         model = Comment
         fields = ('body',)
@@ -35,4 +34,3 @@ class PhotoForm(forms.ModelForm):
             'gravity': 'auto',
             'q_auto': 'good'
         })
-

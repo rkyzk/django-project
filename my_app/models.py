@@ -93,7 +93,7 @@ class Comment(models.Model):
                              related_name="comment_writer") # commenter
     body = models.TextField()
     created_on = models.DateTimeField(auto_now_add=True)
-    approved = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False) # get rid of this
     comment_status = models.IntegerField(choices=COMMENT_STATUS, default=0)
 
     class Meta:

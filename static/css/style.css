@@ -1,3 +1,22 @@
+/**   common to pages  **/
+
+.author-and-date {
+  display: table;
+  width: 100%;
+}
+
+.author {
+  display: table-cell;
+  text-align: left;
+}
+
+.date {
+  display: table-cell;
+  text-align: right;
+}
+
+/**   index  **/
+
 .graphic-box-left {
   height: auto;
   background-color: bisque;
