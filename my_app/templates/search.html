@@ -21,7 +21,7 @@
       <div class="form-row mt-3">
           <div class="form-group col-12">
               <div class="input-group">
-                  <input class="form-control py-2 border-right-0 border" type="search" name="id_exact" placeholder="ID exact..." />
+                  <input class="form-control py-2 border-right-0 border" type="search" name="title_exact" placeholder="Title exact (case insensitive)..." />
                   <span class="input-group-append">
                       <div class="input-group-text bg-transparent">
                           <i class="fa fa-search"></i>
@@ -33,7 +33,7 @@
       <div class="form-row mt-3">
           <div class="form-group col-12">
               <div class="input-group">
-                  <input class="form-control py-2 border-right-0 border" type="search" name="title_or_author" placeholder="Title or author..." />
+                  <input class="form-control py-2 border-right-0 border" type="search" name="title_or_content_contains" placeholder="Title or content contains..." />
                   <span class="input-group-append">
                       <div class="input-group-text bg-transparent">
                           <i class="fa fa-search"></i>
@@ -41,6 +41,30 @@
                   </span>
               </div>
           </div>        
+      </div>
+      <div class="form-row mt-3">
+        <div class="form-group col-12">
+            <div class="input-group">
+                <input class="form-control py-2 border-right-0 border" type="search" name="author_contains" placeholder="Author contains..." />
+                <span class="input-group-append">
+                    <div class="input-group-text bg-transparent">
+                        <i class="fa fa-search"></i>
+                    </div>
+                </span>
+            </div>
+        </div>        
+      </div>
+      <div class="form-row mt-3">
+        <div class="form-group col-12">
+            <div class="input-group">
+                <input class="form-control py-2 border-right-0 border" type="search" name="author_exact" placeholder="Author exact..." />
+                <span class="input-group-append">
+                    <div class="input-group-text bg-transparent">
+                        <i class="fa fa-search"></i>
+                    </div>
+                </span>
+            </div>
+        </div>        
       </div>
       <div class="form-row mt-3">
         <div class="form-group col-md-2 col-lg-2">
@@ -103,13 +127,19 @@
               {% else %}
                 <img class="card-img-top" src=" {{ post.featured_image.url }}" width="100%">
               {% endif %}
-              <p class="author">Author: {{ post.author }}</p>
+              <div>
+                <p class="author">Author: {{ post.author }} | {{ post.published_on }}</p>
+                <strong><p>{{ post.title }}</p></strong>
+                <p>{{ post.excerpt }}</p>
+                <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
+                <p><i class="far fa-heart"></i><span>{{ post.number_of_likes }}</span></p>
+              </div>
             </div>
         </div>    
       </div>
         {% if forloop.counter|divisibleby:3 %}
-      <hr />
     </div>
+    <hr />
     <div class="row">
         {% endif %}
         {% endfor %}

@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 # UserPassesTestMixin
+from django.db.models import Q
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
 from datetime import datetime, timedelta
@@ -283,12 +284,28 @@ class Search(View):
         return render(request, "search.html")
 
     def post(self, request, *args, **kwargs):
-        qs = Post.objects.all()
+        posts = Post.objects.all()
         title_contains_query = request.POST.get('title_contains')
-        title_exact_query = request.GET.get('title_exact')
-        title_or_author_query = request.GET.get('title_or_author')
+        title_exact_query = request.POST.get('title_exact')
+        title_or_content_contains_query = request.POST.get('title_or_content_contains')
+        author_contains_query = request.POST.get('author_contains')
+        author_exact_query = request.POST.get('author_exact')
         if title_contains_query != '' and title_contains_query is not None:
-            qs = qs.filter(title__icontains=title_contains_query)
+            qs = posts.filter(title__icontains=title_contains_query)
+        elif title_exact_query != '' and title_exact_query is not None:
+            qs = posts.filter(title__exact=title_exact_query)
+        elif title_or_content_contains_query != '' and title_or_content_contains_query is not None:
+            qs = posts.filter(Q(title__icontains=title_or_content_contains_query)
+                           | Q(content__icontains=title_or_content_contains_query)
+                           ).distinct()
+
+        elif author_contains_query != '' and author_contains_query is not None:
+            qs = posts.filter(author__username__icontains=author_contains_query)
+
+        elif author_exact_query != '' and author_exact_query is not None:
+            qs = posts.filter(author__username__exact=author_exact_query)
+        else:
+            qs = []
         context = {
             'queryset': qs
         }
