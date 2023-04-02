@@ -253,18 +253,28 @@ class DeletePost(View):
 
 
 class UpdateComment(View):
-
-      def get(self, request, id, *args, **kwargs):
+    def get(self, request, id, *args, **kwargs):
         comment = get_object_or_404(Comment, id=id)
-        form = CommentForm(instnace=comment)
-        return HTTPResponse(form.as_p())
+        comment_form = CommentForm(instance=comment)
 
+        return render(
+            request,
+            "update_comment.html",
+            {
+                "comment_form": comment_form
+            }
+        )
 
-#     def post(self, request, id, *args, **kwargs):
-#         
-#         comment.status = 2
-#         slug = comment.post.slug
-#         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+    def post(self, request, id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=id)
+        comment_form = CommentForm(self.request.POST, instance=comment)
+        updated = comment_form.save(commit=False)
+        updated.name = request.user
+        updated.comment_status = 1
+        slug = comment.post.slug
+        if comment_form.is_valid():
+            updated.save()
+        return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
 class DeleteComment(View):
