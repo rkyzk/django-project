@@ -4,7 +4,6 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 # UserPassesTestMixin
-from django.db.models import Q
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
 from datetime import datetime, timedelta
@@ -141,7 +140,7 @@ class AddStory(LoginRequiredMixin, View):
                 post_form.save()
                 messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')    
         else:
-            pass
+            print("error occured")
         return render(
             request,
             "add_story.html",
@@ -160,7 +159,7 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
                             "title": post.title,
                             "content": post.content,
                             "region": post.region,
-                            "category": post.category
+                            "category": post.category,
                         }
 
         return render(
@@ -168,41 +167,37 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
             "update_post.html",
             {
                 "post_form": PostForm(initial=original_data),
-                # "photo_form": PhotoForm(initial=post.featured_image),
+                "photo_form": PhotoForm(),
                 "post": post
             }
         )
 
 
     def post(self, request, slug, *args, **kwargs):
-        
-        # photo_form = PhotoForm(self.request.POST, self.request.FILES)
+
         post = get_object_or_404(Post, slug=slug)
         post_form = PostForm(self.request.POST, instance=post)
-        # # if photo_form.is_valid():
-        #     photo = photo_form.cleaned_data['image']
-        #     pass
+        photo_form = PhotoForm(self.request.POST, self.request.FILES)
+        
+        if post_form.is_valid() and photo_form.is_valid:
+            post_form.instance.author = self.request.user
+            photo = photo_form.save(commit=False)
+            if photo.image is None:
+                post_form.instance.featured_image = post.featured_image
+            else:
+                post_form.instance.featured_image = photo.image
 
-        post_form.instance.author = self.request.user
-        if 'submit' in self.request.POST.keys():
-            post_form.instance.status = 1
-            message = 'Your draft has been submitted.'
-        else:
-            message = 'Your draft has been saved.'
-        if post_form.is_valid():
-            # post_form.instance.featured_image = photo
-            # photo = photo_form.save(commit=False)        
-            # if photo.image:
-            #     post_form.instance.featured_image = photo.image
-            # else:
-            #     post_form.instance.featured_image
+            if 'submit' in self.request.POST.keys():
+                post_form.instance.status = 1
+                post_form.save()
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been submitted.')
+            else:
+                post_form.save()
+                messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')
 
-            post_form.save()
-            messages.add_message(self.request, messages.SUCCESS, message)    
         else:
             print ("error occured")
-            print ("non",post_form.non_field_errors())
-            
+            print ("non",post_form.non_field_errors())   
             field_errors = [ (field.label, field.errors) for field in post_form]
             print ("field", field_errors)
             print (post_form.errors)
@@ -216,19 +211,6 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
     #             messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
     #         return True
     #     return False
-
-
-# class AddStory(generic.CreateView):
-#     template_name = "add_story.html"
-#     model = Post
-#     fields = ['title', 'content', 'featured_image']
-
-
-# class UpdatePost(generic.UpdateView):
-#     template_name = "update_post.html"
-#     model = Post
-#     fields = ['title', 'content', 'featured_image']
-
 
 # class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
 #     model = Post

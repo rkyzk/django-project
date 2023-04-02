@@ -65,10 +65,6 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-
-        # url_str = str(self.featured_image.url)
-        # self.featured_image.url = url_str[:49] + 'c_fill_pad,g_auto,h_340,w_510,q_auto:good' + url_str[50:]
-        
         super().save(*args, **kwargs)
 
     def __str__(self):
