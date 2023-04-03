@@ -233,13 +233,16 @@ class DeletePost(View):
         return HttpResponseRedirect(reverse('home'))
 
 
-class UpdateComment(generic.FormView):
+class UpdateComment(View):
     # template_name = 'update_comment.html'
     # form_class = CommentForm
-    # success_url = reverse_lazy('<id>:id')
+    # fields = ['body']
 
     # def form_valid(self, form):
-    #     form.save()
+    #     form.instance.name = self.request.user
+    #     comment = form.save(commit=False)
+    #     comment.post = self.object.post
+    #     comment.save()
     #     return super(UpdateComment, self).form_valid(form)
 
     def get(self, request, id, *args, **kwargs):

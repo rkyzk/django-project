@@ -1,18 +1,14 @@
 /**   common to pages  **/
 
-.author-and-date {
-  display: table;
-  width: 100%;
+.btn-container {
+  width: 250px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.author {
-  display: table-cell;
-  text-align: left;
-}
-
-.date {
-  display: table-cell;
-  text-align: right;
+.trash-bin {
+  position: relative;
+  top: 4px;
 }
 
 /**   index  **/

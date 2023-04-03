@@ -24,11 +24,10 @@
       </p>
     </div>
   </div>
-</div>
-<div class="container">
+  <!-- likes and bookmark -->
   <div class="row">
-    <div class="col-1">
-      <strong>
+    <div class="col-lg-4">
+        <strong>
         {% if user.is_authenticated %}
           <form class="d-inline" action="{% url 'post_like' post.slug %}" method="POST">
             {% csrf_token %}
@@ -46,9 +45,8 @@
           <span class="text-secondary"><i class="far fa-heart"></i></span>
         {% endif %}
           <span class="text-secondary">{{ post.number_of_likes }}</span>
-      </strong>
-    </div>
-    <div class="col-4">
+        </strong>
+
       {% if user.is_authenticated %}
         <form class="d-inline" action="{% url 'bookmark' post.slug %}" method="POST">
           {% csrf_token %}
@@ -66,60 +64,68 @@
         </form>
       {% endif %}
     </div>
-  </div>
-  <!-- <div class="row mt-3">
+  </div> <!--end of likes and bookmark -->
+  <!-- Update and Delete buttons -->
+  <div class="btn-container mt-3">
     {% if post.author == user %}
-    <div class="col-md-1">
+    <div class="btn">
       <form method="GET" action="{% url 'update_post' post.slug %}">
         {% csrf_token %}
           <input class="btn btn-submit"type="submit" value="Update">
       </form>
     </div>
-    <div class="col-md-1">
+    <!-- add confirmation method="GET" -->
+    <div class="btn">
       <form method="POST" action="{% url 'delete_post' post.slug %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-submit" class="delete-post">Delete</button>
       </form>
     </div>
     {% endif %}
-  </div>
+  </div> 
+  <!-- Comments section --> 
   <div class="row">
-    {% if post.status == 2 %}
+    <!-- if the post is published-->
+    {% if post.status == 2 %}  
     <div class="col-md-7">
-      <h3 class="my-5">Comments:</h3>
-      <div class="comment-box col-10 position-relative">
+      <h3 class="my-5">Comments</h3>
+      <div class="col-10 position-relative">
       {% for comment in comments %}
+        <!-- Say 'Comment deleted' where a comment has been deleted -->
         {% if comment.comment_status == 2 %}
-        <p>Comment deleted</p>
+        <p class="text-muted">Comment deleted</p>
+        <hr/>
         {% else %}
+        <!-- Say 'edited' if the comment has been edited.-->
           {% if comment.comment_status == 1 %}
           <p class="text-muted">edited</p>
           {% endif %}   
         {{ comment.name }}
         <span class="position-absolute end-0">{{ comment.created_on|date:'M d, Y' }}</span>
         {{ comment.body | linebreaks }}
-        <p class="mt-3">{% if comment.name == user %}</p>
-        <div class="row position-absolute end-0">
+        <!-- if the comment has been written by the user, show update and delete buttons -->
+        {% if comment.name == user %}
+        <div class="row">
           <div class="col-1">
-            <form method="Post" action="{% url 'update_comment' comment.id %}" class="mt-3">
+            <form method="Get" action="{% url 'update_comment' comment.id %}" class="mt-3">
+              {% csrf_token %}
               <button type="submit" class="btn">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
             </form>
-          </div>
-          
+          </div>          
           <div class="col-1">
-            <form method="Post" action="{% url 'delete_comment' comment.id %}" class="mt-3">
+            <form method="Get" action="{% url 'delete_comment' comment.id %}" class="mt-3">
               {% csrf_token %}
-              <button type="submit" class="btn btn-sm">
+              <button type="submit" class="btn btn-sm mt-1">
                 <i class="fa-regular fa-trash-can"></i>
               </button>
             </form>
           </div>
         </div>
         {% endif %}
-      <hr/>
-      {% endif %}
+        <hr/>
+        {% endif %}
       {% endfor %}
       </div>
     </div>
