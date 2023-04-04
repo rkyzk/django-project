@@ -2,8 +2,7 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic, View
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-# UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin # UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
 from datetime import datetime, timedelta
@@ -13,7 +12,6 @@ class PostList(generic.ListView):
     model = Post
     queryset = Post.objects.filter(featured_flag=True).order_by("-created_on")
     template_name = "index.html"
-    paginate_by = 3
 
 
 class PostMoreStories(generic.ListView):
@@ -150,7 +148,12 @@ class AddStory(LoginRequiredMixin, View):
         )
 
 
-class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
+# if post.status == 2:
+#                 messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
+    
+
+
+class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
 
     def get(self, request, slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=slug)
@@ -202,12 +205,11 @@ class UpdatePost(LoginRequiredMixin, View):  # UserPassesTestMixin
             print (post_form.errors)
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
-    
+
     # def test_func(self):
-    #     post = self.get_object()
+    #     post = get_object_or_404(Post, slug=slug)
+    
     #     if self.request.user == post.author:
-    #         if post.status == 2:
-    #             messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
     #         return True
     #     return False
 
@@ -233,41 +235,30 @@ class DeletePost(View):
         return HttpResponseRedirect(reverse('home'))
 
 
-class UpdateComment(generic.edit.UpdateView):
-    model = Comment
-    template_name = 'comment_update_form.html'
-    # form_class = CommentForm
-    fields = ['body']
+class UpdateComment(View):
 
-    # def form_valid(self, form):
-    #     form.instance.name = self.request.user
-    #     comment = form.save(commit=False)
-    #     comment.post = self.object.post
-    #     comment.save()
-    #     return super(UpdateComment, self).form_valid(form)
+    def get(self, request, id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=id)
+        comment_form = CommentForm(instance=comment)
 
-    # def get(self, request, id, *args, **kwargs):
-    #     # comment = get_object_or_404(Comment, id=id)
-    #     # comment_form = CommentForm(instance=comment)
+        return render(
+            request,
+            "update_comment.html",
+            {
+                "comment_form": comment_form
+            }
+        )
 
-    #     return render(
-    #         request,
-    #         "update_comment.html",
-    #         {
-    #             # "comment_form": comment_form
-    #         }
-    #     )
-
-    # def post(self, request, id, *args, **kwargs):
-    #     comment = get_object_or_404(Comment, id=id)
-    #     comment_form = CommentForm(self.request.POST, instance=comment)
-    #     updated = comment_form.save(commit=False)
-    #     updated.name = request.user
-    #     updated.comment_status = 1
-    #     slug = comment.post.slug
-    #     if comment_form.is_valid():
-    #         updated.save()
-    #     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+    def post(self, request, id, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=id)
+        comment_form = CommentForm(self.request.POST, instance=comment)
+        updated = comment_form.save(commit=False)
+        updated.name = request.user
+        updated.comment_status = 1
+        slug = comment.post.slug
+        if comment_form.is_valid():
+            updated.save()
+        return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
 class DeleteComment(View):
