@@ -107,20 +107,20 @@
         {% if comment.name == user %}
         <div class="row">
           <div class="col-1">
-            <form method="Get" action="{% url 'update_comment' comment.id %}" class="mt-3">
+            <a href="{% url 'update_comment' comment.id %}" class="mt-3">
               {% csrf_token %}
               <button type="submit" class="btn">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-            </form>
+            </a>
           </div>          
           <div class="col-1">
-            <form method="Get" action="{% url 'delete_comment' comment.id %}" class="mt-3">
+            <a href="{% url 'delete_comment' comment.id %}" class="mt-3">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm mt-1">
                 <i class="fa-regular fa-trash-can"></i>
               </button>
-            </form>
+            </a>
           </div>
         </div>
         {% endif %}

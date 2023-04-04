@@ -4,13 +4,13 @@
 
 {% load crispy_forms_tags %}
   <div>
-    <form action="{% url 'update_comment' comment.id %}" method="post" class="form">
+    <form method="POST" class="form">
       {% csrf_token %}
         <h4>Update Post</h4>
           {{ comment_form | crispy}}
             <div>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <input type="submit" class="btn btn-primary" value="Save changes" />
+                <input type="submit" class="btn btn-primary" value="Update" />
             </div>
     </form>
   </div>

@@ -233,10 +233,11 @@ class DeletePost(View):
         return HttpResponseRedirect(reverse('home'))
 
 
-class UpdateComment(View):
-    # template_name = 'update_comment.html'
+class UpdateComment(generic.edit.UpdateView):
+    model = Comment
+    template_name = 'comment_update_form.html'
     # form_class = CommentForm
-    # fields = ['body']
+    fields = ['body']
 
     # def form_valid(self, form):
     #     form.instance.name = self.request.user
@@ -245,28 +246,28 @@ class UpdateComment(View):
     #     comment.save()
     #     return super(UpdateComment, self).form_valid(form)
 
-    def get(self, request, id, *args, **kwargs):
-        comment = get_object_or_404(Comment, id=id)
-        comment_form = CommentForm(instance=comment)
+    # def get(self, request, id, *args, **kwargs):
+    #     # comment = get_object_or_404(Comment, id=id)
+    #     # comment_form = CommentForm(instance=comment)
 
-        return render(
-            request,
-            "update_comment.html",
-            {
-                "comment_form": comment_form
-            }
-        )
+    #     return render(
+    #         request,
+    #         "update_comment.html",
+    #         {
+    #             # "comment_form": comment_form
+    #         }
+    #     )
 
-    def post(self, request, id, *args, **kwargs):
-        comment = get_object_or_404(Comment, id=id)
-        comment_form = CommentForm(self.request.POST, instance=comment)
-        updated = comment_form.save(commit=False)
-        updated.name = request.user
-        updated.comment_status = 1
-        slug = comment.post.slug
-        if comment_form.is_valid():
-            updated.save()
-        return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+    # def post(self, request, id, *args, **kwargs):
+    #     comment = get_object_or_404(Comment, id=id)
+    #     comment_form = CommentForm(self.request.POST, instance=comment)
+    #     updated = comment_form.save(commit=False)
+    #     updated.name = request.user
+    #     updated.comment_status = 1
+    #     slug = comment.post.slug
+    #     if comment_form.is_valid():
+    #         updated.save()
+    #     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
 class DeleteComment(View):
