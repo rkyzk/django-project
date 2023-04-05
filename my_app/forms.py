@@ -21,6 +21,7 @@ class PhotoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PhotoForm, self).__init__(*args, **kwargs)
         self.fields['image'].required = False
+        # self.fields['name'] = "photo_form"
 
 
     class Meta:

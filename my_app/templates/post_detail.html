@@ -77,7 +77,7 @@
     <!-- add confirmation method="GET" -->
     <div class="btn">
       <form method="GET" action="{% url 'delete_post' post.slug %}">
-        <button type="submit" class="btn btn-submit" class="delete-post">Delete</button>
+        <button type="submit" class="btn btn-submit delete_post" class="delete-post">Delete</button>
       </form>
     </div>
     {% endif %}
@@ -85,7 +85,7 @@
   <!-- Comments section --> 
   <!-- if the post is published-->
   {% if post.status == 2 %}
-  <div class="row"></div>
+  <div class="row">
     <div class="col-md-7">
       <h3 class="my-5">Comments</h3>
       <div class="col-10 position-relative">
@@ -106,15 +106,40 @@
         {% if comment.name == user %}
         <div class="row">
           <div class="col-1">
-            <form method="GET" action="{% url 'update_comment' comment.id %}" class="mt-3">
+            <!-- <form method="GET" action="{% url 'update_comment' comment.id %}" class="mt-3">
               {% csrf_token %}
               <button type="submit" class="btn">
                 <i class="fa-regular fa-pen-to-square"></i>
               </button>
-            </form>
-          </div>          
+            </form> -->
+
+            <button type="button" class="btn btn-submit" data-toggle="modal" data-target="#updateModal">
+              Update
+            </button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form method="POST" action="{% url 'update_comment' comment.id %}" class="mt-3">
+                      {% csrf_token %}
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Save changes</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>     
+
           <div class="col-1">
-            <form method="POST" action="{% url 'delete_comment' comment.id %}" class="mt-3">
+            <form method="POST" action="{% url 'delete_comment' comment.id %}" class="mt-3 delete_comment">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm mt-1">
                 <i class="fa-regular fa-trash-can"></i>
@@ -149,6 +174,23 @@
   </div>
   {% endif %}
 </div>
+<script>
+// Confirm if user wants to delete the post
+const DELETE_POST ="Are you sure you want to delete your post?"
+$('.delete_post').click(function() {
+  return confirm(DELETE_POST);
+});
+
+// Confirm if user wants to delete the comment
+const DELETE_COMMENT ="Are you sure you want to delete your comment?"
+$('.delete_comment').click(function() {
+  return confirm(DELETE_COMMENT);
+});
+
+$('.update_comment').click(function() {
+  return confirm(DELETE_COMMENT);
+});
+</script>
 {% endblock content %}
 
 

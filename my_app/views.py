@@ -164,12 +164,14 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
                             "category": post.category,
                         }
 
+        image = post.featured_image.image
+
         return render(
             request,
             "update_post.html",
             {
                 "post_form": PostForm(initial=original_data),
-                "photo_form": PhotoForm(),
+                "photo_form": PhotoForm(image),
                 "post": post
             }
         )
@@ -184,10 +186,10 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
         if post_form.is_valid() and photo_form.is_valid:
             post_form.instance.author = self.request.user
             photo = photo_form.save(commit=False)
-            if photo.image is None:
-                post_form.instance.featured_image = post.featured_image
-            else:
-                post_form.instance.featured_image = photo.image
+            # if photo.image is None:
+            #     post_form.instance.featured_image = post.featured_image
+            # else:
+            post_form.instance.featured_image = photo.image
 
             if 'submit' in self.request.POST.keys():
                 post_form.instance.status = 1
@@ -228,7 +230,7 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
 
 class DeletePost(View):
 
-    def post(self, request, slug, *args, **kwargs):
+    def get(self, request, slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=slug)
         post.delete()
         messages.add_message(self.request, messages.SUCCESS, 'Your draft has been deleted.')
@@ -263,29 +265,9 @@ class UpdateComment(View):
 
 class DeleteComment(View):
 
-    def get(self, request, *args, **kwargs):
-        return render(
-            request,
-            "post_detail.html",
-            {
-                'delete_confirmation': True,
-            }
-        )
-
-
     def post(self, request, id, *args, **kwargs):
-        return render(
-            request,
-            "post_detail.html",
-            {
-                'delete_confirmation': True,
-            }
-        )
-
         comment = get_object_or_404(Comment, id=id)
         comment.comment_status = 2
-        print(comment.body)
-        print(comment.comment_status)
         slug = comment.post.slug
         comment.save()
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))

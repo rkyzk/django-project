@@ -10,16 +10,16 @@
       {% csrf_token %}
       {{ post_form | crispy }}
       <div id="div_id_featured_image" class="form-group">
-        <label for="id_featured_image">	
-        </label>
+        <label for="id_featured_image"></label>
         <div class="row">
           <div class="col-md-3">
-            Currently: <img src="{{ post.featured_image.url }}" width="150px" height="auto">
+            Current image: <img src="{{ post.featured_image.url }}" width="150px" height="auto">
           </div>
         </div>
         <div class="row mt-3">
           Replace:
           {{ photo_form | crispy }}
+          <button class="btn-lg" onclick="form_reset();">Reset</button>
         </div>
       </div>
       <div class="mt-3">
@@ -29,4 +29,12 @@
     </form>
   </div>
 </div>
+<script>
+  function form_reset() {
+    var photoForm = document.getElementById("id_image");
+    alert("resetting"); 
+    photoForm.value = "";
+
+  }
+</script>
 {% endblock content %}
