@@ -76,17 +76,16 @@
     </div>
     <!-- add confirmation method="GET" -->
     <div class="btn">
-      <form method="POST" action="{% url 'delete_post' post.slug %}">
-        {% csrf_token %}
+      <form method="GET" action="{% url 'delete_post' post.slug %}">
         <button type="submit" class="btn btn-submit" class="delete-post">Delete</button>
       </form>
     </div>
     {% endif %}
   </div> 
   <!-- Comments section --> 
-  <div class="row">
-    <!-- if the post is published-->
-    {% if post.status == 2 %}  
+  <!-- if the post is published-->
+  {% if post.status == 2 %}
+  <div class="row"></div>
     <div class="col-md-7">
       <h3 class="my-5">Comments</h3>
       <div class="col-10 position-relative">
@@ -125,10 +124,11 @@
         </div>
         {% endif %}
         <hr/>
-        {% endif %}
+      {% endif %}
       {% endfor %}
       </div>
     </div>
+  
     <div class="col-md-5">
       {% if user.is_authenticated %}
         <h3>Leave a comment:</h3>
@@ -150,28 +150,7 @@
   {% endif %}
 </div>
 {% endblock content %}
-<script>
-$(document).ready(function(){
-  $("#updateModal").click(function(){
-    var pk = $(this).data('comment.id')
-    $("#myModal").modal("show");
-  });
-  $("#myModal").on('show.bs.modal', function(event){
-    var modal = $(this)
-    var pk = $(this).data('pid')
-    $.ajax({
-        data: {'pk': pk},
-        url: "{% url 'search:load_paper' %}",
-        context: document.body,
-        error: function(response, error) {
-            alert(error);
-        }
-    }).done(function(response) {
-        modal.html(response);
-    });
-  });
-});
-</script>
+
 
 
 

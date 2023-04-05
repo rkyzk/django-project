@@ -263,7 +263,25 @@ class UpdateComment(View):
 
 class DeleteComment(View):
 
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            "post_detail.html",
+            {
+                'delete_confirmation': True,
+            }
+        )
+
+
     def post(self, request, id, *args, **kwargs):
+        return render(
+            request,
+            "post_detail.html",
+            {
+                'delete_confirmation': True,
+            }
+        )
+
         comment = get_object_or_404(Comment, id=id)
         comment.comment_status = 2
         print(comment.body)
