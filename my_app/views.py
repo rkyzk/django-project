@@ -281,74 +281,138 @@ class DeleteComment(View):
 
 class Search(View):
     def get(self, request, *args, **kwargs):
+        qs = []
         category_choices = Post._meta.get_field('category').choices
         categories = [cat[1] for cat in category_choices]
         region_choices = Post._meta.get_field('region').choices
         regions = [region[1] for region in region_choices]
-
         category = request.GET.get('category')
-        
-        context = {
-            "categories": categories,
-            "regions": regions,
-        }
-        return render(request, "search.html", context)
 
-    def post(self, request, *args, **kwargs):
         posts = Post.objects.all()
-        title_contains_query = request.POST.get('title_contains')
-        title_exact_query = request.POST.get('title_exact')
-        content_contains_query = request.POST.get('content_contains')
-        author_contains_query = request.POST.get('author_contains')
-        author_exact_query = request.POST.get('author_exact')
+        title_query = request.GET.get('title_input')
+        print(title_query)
+        filter_type = request.GET.get('title_option')
+        print(filter_type)
+        # selected_label = DROP1_DICT[selected_value]
+        # print(selected_value)
+        # print(selected_label)
+        # content_contains_query = request.GET.get('content_contains')
+        # author_contains_query = request.GET.get('author_contains')
+        # author_exact_query = request.GET.get('author_exact')
     
-        liked_count_min_query = request.POST.get('liked_count_min')
-        pub_date_min_query = request.POST.get('date_min')
-        pub_date_max_query = request.POST.get('date_max')
+        # liked_count_min_query = request.GET.get('liked_count_min')
+        # pub_date_min_query = request.GET.get('date_min')
+        # pub_date_max_query = request.GET.get('date_max')
         
-        category = request.POST.get('category')
-        region = request.POST.get('region')
+        # category = request.GET.get('category')
+        # region = request.GET.get('region')
 
-        if title_contains_query != '' and title_contains_query is not None:
-            qs = posts.filter(title__icontains=title_contains_query)
+        if title_query != '' and title_query is not None:
+            if filter_type == "contains":
+                qs = posts.filter(title__icontains=title_query)
+            else:
+                qs = posts.filter(title__exact=title_query)
 
-        elif title_exact_query != '' and title_exact_query is not None:
-            qs = posts.filter(title__exact=title_exact_query)
+        # elif title_exact_query != '' and title_exact_query is not None:
+        #     qs = posts.filter(title__exact=title_exact_query)
 
-        elif content_contains_query != '' and content_contains_query is not None:
-            qs = posts.filter(content__icontains=content_contains_query)
+        # elif content_contains_query != '' and content_contains_query is not None:
+        #     qs = posts.filter(content__icontains=content_contains_query)
 
-        elif author_contains_query != '' and author_contains_query is not None:
-            qs = posts.filter(author__username__icontains=author_contains_query)
+        # elif author_contains_query != '' and author_contains_query is not None:
+        #     qs = posts.filter(author__username__icontains=author_contains_query)
 
-        elif author_exact_query != '' and author_exact_query is not None:
-            qs = posts.filter(author__username__exact=author_exact_query)
+        # elif author_exact_query != '' and author_exact_query is not None:
+        #     qs = posts.filter(author__username__exact=author_exact_query)
 
-        elif pub_date_min_query != '' and pub_date_min_query is not None:
-            min_date_str = pub_date_min_query + ' 00:00:00.000000+00:00'
-            print(f'min_date_str: ' + min_date_str)
-            min_date = datetime.strptime(min_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
-            print(type(min_date))
-            print(min_date)
-            # qs = posts.filter(published_on >= min_date)
-            # print(qs)
+        # elif pub_date_min_query != '' and pub_date_min_query is not None:
+        #     min_date_str = pub_date_min_query + ' 00:00:00.000000+00:00'
+        #     print(f'min_date_str: ' + min_date_str)
+        #     min_date = datetime.strptime(min_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
+        #     print(type(min_date))
+        #     print(min_date)
+        #     # qs = posts.filter(published_on >= min_date)
+        #     # print(qs)
 
-        elif liked_count_min_query:
-            qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
+        # elif liked_count_min_query:
+        #     qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
 
-        elif region != 'Choose...':
-            qs = [post for post in posts if post.get_region_display() == region]
-        elif category != 'Choose...':
-            qs = [post for post in posts if post.get_category_display() == category]
-        # if qs = []:
-           # no_posts = "No posts found"
-        else:
-            qs = []
+        # elif region != 'Choose...':
+        #     qs = [post for post in posts if post.get_region_display() == region]
+        # elif category != 'Choose...':
+        #     qs = [post for post in posts if post.get_category_display() == category]
+        # # if qs = []:
+        #    # no_posts = "No posts found"
+        # else:
+        #     qs = []
+        # context = {
+        #     'queryset': qs,
+        #     # 'no_posts': no_posts
+        # }
+        # return render(request, "search.html", context)
+
         context = {
+            'categories': categories,
+            'regions': regions,
             'queryset': qs,
-            # 'no_posts': no_posts
         }
         return render(request, "search.html", context)
+
+    # def post(self, request, *args, **kwargs):
+    #     posts = Post.objects.all()
+    #     title_contains_query = request.POST.get('title_contains')
+    #     title_exact_query = request.POST.get('title_exact')
+    #     content_contains_query = request.POST.get('content_contains')
+    #     author_contains_query = request.POST.get('author_contains')
+    #     author_exact_query = request.POST.get('author_exact')
+    
+    #     liked_count_min_query = request.POST.get('liked_count_min')
+    #     pub_date_min_query = request.POST.get('date_min')
+    #     pub_date_max_query = request.POST.get('date_max')
+        
+    #     category = request.POST.get('category')
+    #     region = request.POST.get('region')
+
+    #     if title_contains_query != '' and title_contains_query is not None:
+    #         qs = posts.filter(title__icontains=title_contains_query)
+
+    #     elif title_exact_query != '' and title_exact_query is not None:
+    #         qs = posts.filter(title__exact=title_exact_query)
+
+    #     elif content_contains_query != '' and content_contains_query is not None:
+    #         qs = posts.filter(content__icontains=content_contains_query)
+
+    #     elif author_contains_query != '' and author_contains_query is not None:
+    #         qs = posts.filter(author__username__icontains=author_contains_query)
+
+    #     elif author_exact_query != '' and author_exact_query is not None:
+    #         qs = posts.filter(author__username__exact=author_exact_query)
+
+    #     elif pub_date_min_query != '' and pub_date_min_query is not None:
+    #         min_date_str = pub_date_min_query + ' 00:00:00.000000+00:00'
+    #         print(f'min_date_str: ' + min_date_str)
+    #         min_date = datetime.strptime(min_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
+    #         print(type(min_date))
+    #         print(min_date)
+    #         # qs = posts.filter(published_on >= min_date)
+    #         # print(qs)
+
+    #     elif liked_count_min_query:
+    #         qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
+
+    #     elif region != 'Choose...':
+    #         qs = [post for post in posts if post.get_region_display() == region]
+    #     elif category != 'Choose...':
+    #         qs = [post for post in posts if post.get_category_display() == category]
+    #     # if qs = []:
+    #        # no_posts = "No posts found"
+    #     else:
+    #         qs = []
+    #     context = {
+    #         'queryset': qs,
+    #         # 'no_posts': no_posts
+    #     }
+    #     return render(request, "search.html", context)
 
 
 class MyPage(View):
