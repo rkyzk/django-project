@@ -245,9 +245,10 @@ class UpdateComment(View):
 
         return render(
             request,
-            "update_comment.html",
+            "post_detail.html",
             {
-                "comment_form": comment_form
+                "comment_form": comment_form,
+                "update_flag": True
             }
         )
 
