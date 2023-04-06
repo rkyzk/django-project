@@ -52,7 +52,8 @@ class PostDetail(View):
                 "commented": False,
                 "liked": liked,
                 "bookmarked": bookmarked,
-                "comment_form": CommentForm()
+                "comment_form": CommentForm(),
+                "update_form": None
             },
         )
 
@@ -241,18 +242,22 @@ class UpdateComment(View):
 
     def get(self, request, id, *args, **kwargs):
         comment = get_object_or_404(Comment, id=id)
-        comment_form = CommentForm(instance=comment)
+        update_form = CommentForm(instance=comment)
+        comment_form = CommentForm()
+        slug = comment.post.slug
 
         return render(
             request,
             "post_detail.html",
             {
                 "comment_form": comment_form,
-                "update_flag": True
+                "update_form": update_form
             }
         )
 
+
     def post(self, request, id, *args, **kwargs):
+
         comment = get_object_or_404(Comment, id=id)
         comment_form = CommentForm(self.request.POST, instance=comment)
         updated = comment_form.save(commit=False)

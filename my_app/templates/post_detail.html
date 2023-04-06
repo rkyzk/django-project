@@ -66,87 +66,74 @@
     </div>
   </div> <!--end of likes and bookmark -->
   <!-- Update and Delete buttons -->
-  <div class="btn-container mt-3">
-    {% if post.author == user %}
+  {% if post.author == user %}
+  <div class="btn-container mt-3">    
     <div class="btn">
       <form method="GET" action="{% url 'update_post' post.slug %}">
         {% csrf_token %}
           <input class="btn btn-submit"type="submit" value="Update">
       </form>
     </div>
-    <!-- add confirmation method="GET" -->
     <div class="btn">
       <form method="GET" action="{% url 'delete_post' post.slug %}">
         <button type="submit" class="btn btn-submit delete_post" class="delete-post">Delete</button>
       </form>
-    </div>
-    {% endif %}
+    </div>  
   </div> 
-  <!-- Comments section --> 
-  <!-- if the post is published-->
+  {% endif %}
+  <!-- Comments section if the post has been published --> 
   {% if post.status == 2 %}
   <div class="row">
     <div class="col-md-7">
       <h3 class="my-5">Comments</h3>
       <div class="col-10 position-relative">
       {% for comment in comments %}
-        <!-- Say 'Comment deleted' where a comment has been deleted -->
-          {% if comment.comment_status == 2 %}
-          <p class="text-muted mb-5">Comment deleted</p>
-          <hr/>
+        <!-- if the commenter has hit the update comment button, show the comment form for update-->
+        {% if upate_form %}
+        <form method="post" style="margin-top: 1.3em;">
+          {{ update_form | crispy }}
+          {% csrf_token %}
+          <button type="submit" name="submit" value="update" class="btn-submitbtn-lg mt-3">Save changes</button>
+          <button type="submit" name="submit" value="cancel" class="btn-submit btn-lg mt-3">Cancel</button>
+        </form>
+        {% else %}
+          <!-- if the comment has been edited, say 'edited.' -->
+          {% if comment.comment_status == 1 %}
+            <span class="text-muted">edited</span>
+          {% endif %}
+          {% if comment.comment_status != 2 %}  
+            {{ comment.name }}
+            <span class="position-absolute end-0">{{ comment.created_on|date:'M d, Y' }}</span>
+            {{ comment.body | linebreaks }}
+            <!-- if the comment has been written by the user, show update and delete buttons -->
+            {% if comment.name == user %}
+            <div class="row">
+              <div class="col-1">
+                <form method="GET" action="{% url 'update_comment' comment.id %}">
+                  <button type="submit" class="btn btn-submit">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </button>
+                </form>
+              </div>
+              <div class="col-1">
+                <form method="POST" action="{% url 'delete_comment' comment.id %}" class="mt-3 delete_comment">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm mt-1">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% endif %}
           {% else %}
-          <!-- Say 'edited' if the comment has been edited.-->
-            {% if comment.comment_status == 1 %}
-            <p class="text-muted">edited</p>
-            {% endif %}   
-          {{ comment.name }}
-          <span class="position-absolute end-0">{{ comment.created_on|date:'M d, Y' }}</span>
-          {{ comment.body | linebreaks }}
-          <!-- if the comment has been written by the user, show update and delete buttons -->
-          {% if comment.name == user %}
-          <div class="row">
-            <div class="col-1">
-              <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#updateModal">
-                <i class="fa-regular fa-pen-to-square"></i>
-              </button>
-              <!-- Modal -->
-              <div id="updateModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-              
-                  <!-- Modal content-->
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                      <h4 class="modal-title">Update Comment</h4>
-                    </div>
-                    <div class="modal-body">
-                      <p>Some text in the modal.</p>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    </div>
-                  </div>
-              
-                </div>
-              </div>  
-
-          <div class="col-1">
-            <form method="POST" action="{% url 'delete_comment' comment.id %}" class="mt-3 delete_comment">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm mt-1">
-                <i class="fa-regular fa-trash-can"></i>
-              </button>
-            </form>
-          </div>
-        </div>
+            <p class="text-muted mb-5">Comment deleted</p>
+            <hr/>
+          {% endif %}
         {% endif %}
-        <hr/>
-      {% endif %}
+        <hr/>          
       {% endfor %}
       </div>
     </div>
-  </div>
-  
     <div class="col-md-5">
       {% if user.is_authenticated %}
         <h3>Leave a comment:</h3>
@@ -180,9 +167,6 @@ $('.delete_comment').click(function() {
   return confirm(DELETE_COMMENT);
 });
 
-// $('#updateComment').on('shown.bs.modal', function () {
-  
-// })
 </script>
 {% endblock content %}
 
