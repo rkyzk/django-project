@@ -290,9 +290,14 @@ class Search(View):
 
         posts = Post.objects.all()
         title_query = request.GET.get('title_input')
-        print(title_query)
-        filter_type = request.GET.get('title_option')
-        print(filter_type)
+        title_filter_type = request.GET.get('title_option')
+        author_query = request.GET.get('author_input')
+        author_filter_type = request.GET.get('author_filter')
+        kw_query_list = [request.GET.get('keyword_1'),
+                         request.GET.get('keyword_2'),
+                         request.GET.get('keyword_3')
+                    ]
+        
         # selected_label = DROP1_DICT[selected_value]
         # print(selected_value)
         # print(selected_label)
@@ -307,21 +312,40 @@ class Search(View):
         # category = request.GET.get('category')
         # region = request.GET.get('region')
 
-        if title_query != '' and title_query is not None:
-            if filter_type == "contains":
-                qs = posts.filter(title__icontains=title_query)
+        qs_kw = []
+        query_lists = [title_query, author_query, qs_kw]
+        for kw in kw_query_list:
+            if kw != '' and kw is not None:
+                qs = posts.filter(Q(title_icontains=kw) and Q(content_icontains=kw))
+                qs_kw.append(qs)
+        if qs_kw == []:
+            query_lists.remove(qs_kw)
+
+        if title_query is None:   # not necessary to say is None or != ''
+            query_lists.remove(title_query)
+        else:
+            if title_filter_type == "contains":
+                qs_title = posts.filter(title__icontains=title_query)
             else:
-                qs = posts.filter(title__exact=title_query)
+                qs_title = posts.filter(title__exact=title_query)
 
-        # elif title_exact_query != '' and title_exact_query is not None:
-        #     qs = posts.filter(title__exact=title_exact_query)
+        if author_query is None:
+            query_lists.remove(author_query)
+        else:
+            if author_filter_type == "contains":
+                qs_author = posts.filter(author__username__icontains=author_query)
+            else:
+                qs_author = posts.filter(author__username__exact=author_query)
 
-        # elif content_contains_query != '' and content_contains_query is not None:
-        #     qs = posts.filter(content__icontains=content_contains_query)
+        i = 0
+        if query_lists != []:
+            qs = query_lists[0]
+            for i in range(len(query_lists) - 1):
+                print("hi")
+                qs = [post for post in query_lists[i] if post in query_lists[i+1]]
+                i += 1
 
-        # elif author_contains_query != '' and author_contains_query is not None:
-        #     qs = posts.filter(author__username__icontains=author_contains_query)
-
+            print(qs)
         # elif author_exact_query != '' and author_exact_query is not None:
         #     qs = posts.filter(author__username__exact=author_exact_query)
 

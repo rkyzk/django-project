@@ -7,13 +7,17 @@
     <form method="GET" action="{% url 'search' %}">
       {% csrf_token %}
       <div class="row mt-3">
-        <div class="form-group col-5">
-          <p>Title</p>
-          <div class="input-group">
+        <div class="form-group">
+          <div class="col-md-3">
+            <p>Title</p>
+          </div>
+          <div class="col-md-3">
             <select name="title_option" id="title_option">
               <option value="contains" selected>contains</option>
               <option value="is_exactly">is exactly</option>
             </select>
+          </div>
+          <div class="col-md-6">
             <input class="form-control py-2 border-right-0 border" type="search" name="title_input" />
             <span class="input-group-append">
               <div class="input-group-text bg-transparent">
@@ -23,10 +27,36 @@
           </div>
         </div>        
       </div>
-      <div class="form-row mt-3">
+
+      <div class="row mt-3">
+        <div class="form-group">
+          <div class="col-md-3">
+            <p>Author</p>
+          </div>
+          <div class="col-md-3">
+            <select name="title_option" id="author_filter">
+              <option value="contains" selected>contains</option>
+              <option value="is_exactly">is exactly</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <input class="form-control py-2 border-right-0 border" type="search" name="author_input" />
+            <span class="input-group-append">
+              <div class="input-group-text bg-transparent">
+                <i class="fa fa-search"></i>
+              </div>
+            </span>
+          </div>
+        </div>        
+      </div>
+      
+      <div class="row mt-3">
           <div class="form-group col-12">
-              <div class="input-group">
-                  <input class="form-control py-2 border-right-0 border" type="search" name="title_exact" placeholder="Title exact (case insensitive)..." />
+              <div class="">
+                <p>Keyword(s): Title or Content contains </p>
+                  <input class="form-control py-2 border-right-0 border" type="search" name="keyword_1" />
+                  <input class="form-control py-2 border-right-0 border" type="search" name="keyword_2" />
+                  <input class="form-control py-2 border-right-0 border" type="search" name="keyword_3" />
                   <span class="input-group-append">
                       <div class="input-group-text bg-transparent">
                           <i class="fa fa-search"></i>
@@ -35,42 +65,7 @@
               </div>
           </div>        
       </div>
-      <div class="form-row mt-3">
-          <div class="form-group col-12">
-              <div class="input-group">
-                  <input class="form-control py-2 border-right-0 border" type="search" name="content_contains" placeholder="Content contains..." />
-                  <span class="input-group-append">
-                      <div class="input-group-text bg-transparent">
-                          <i class="fa fa-search"></i>
-                      </div>
-                  </span>
-              </div>
-          </div>        
-      </div>
-      <div class="form-row mt-3">
-        <div class="form-group col-12">
-            <div class="input-group">
-                <input class="form-control py-2 border-right-0 border" type="search" name="author_contains" placeholder="Author contains..." />
-                <span class="input-group-append">
-                    <div class="input-group-text bg-transparent">
-                        <i class="fa fa-search"></i>
-                    </div>
-                </span>
-            </div>
-        </div>        
-      </div>
-      <div class="form-row mt-3">
-        <div class="form-group col-12">
-            <div class="input-group">
-                <input class="form-control py-2 border-right-0 border" type="search" name="author_exact" placeholder="Author exact..." />
-                <span class="input-group-append">
-                    <div class="input-group-text bg-transparent">
-                        <i class="fa fa-search"></i>
-                    </div>
-                </span>
-            </div>
-        </div>        
-      </div>
+  
       <div class="row mt-3">
         <div class="form-group col-md-2 col-lg-2">
           <label for="viewCountMin">Viewed more than</label>
