@@ -289,7 +289,11 @@ class Search(View):
         regions = [region[1] for region in region_choices]
         category = request.GET.get('category')
 
-        posts = Post.objects.all()
+        posts = Post.objects.filter(status=2)
+        print("published date")
+        print(posts[0].published_on)
+        print(type(posts[0].published_on))
+
         title_query = request.GET.get('title_input')
         title_filter_type = request.GET.get('title_option')
         author_query = request.GET.get('author_input')
@@ -302,13 +306,11 @@ class Search(View):
         # selected_label = DROP1_DICT[selected_value]
         # print(selected_value)
         # print(selected_label)
-        # content_contains_query = request.GET.get('content_contains')
-        # author_contains_query = request.GET.get('author_contains')
-        # author_exact_query = request.GET.get('author_exact')
     
-        # liked_count_min_query = request.GET.get('liked_count_min')
-        # pub_date_min_query = request.GET.get('date_min')
-        # pub_date_max_query = request.GET.get('date_max')
+    
+        min_liked_query = request.GET.get('liked_count_min')
+        pub_date_min_query = request.GET.get('date_min')
+        pub_date_max_query = request.GET.get('date_max')
         
         # category = request.GET.get('category')
         # region = request.GET.get('region')
@@ -319,9 +321,7 @@ class Search(View):
         for kw in kw_query_list:
             if kw != '' and kw is not None:
                 qs = posts.filter(Q(title__icontains=kw) | Q(content__icontains=kw))
-                qs_kw.append(qs)
-        if qs_kw != []:
-            query_lists.append(qs_kw)
+                query_lists.append(qs)
         print("q_lists")
         print(query_lists)
 
@@ -337,41 +337,36 @@ class Search(View):
             if qs_title != []:
                 query_lists.append(qs_title)
 
-        # if author_query != '' and quthor_query is not None:
-        #     if author_filter_type == "contains":
-        #         qs_author = posts.filter(author__username__icontains=author_query)
-        #     else:
-        #         qs_author = posts.filter(author__username__exact=author_query)
-        print("ql_0")
-        print(query_lists[0][0])
-        print("ql_1")
-        print(query_lists[1][0])
-        if query_lists != []:
-            qs = query_lists[0]
-            if len(query_lists) > 1:
-                print("hello")
-                i = 0
-                for i in range(len(query_lists) - 1):
-                    print("hi")
-                    qs = [post for post in query_lists[i] if post in query_lists[i+1]]
-                    i += 1
+        if author_query != '' and author_query is not None:
+            if author_filter_type == "contains":
+                qs_author = posts.filter(author__username__icontains=author_query)
+            else:
+                qs_author = posts.filter(author__username__exact=author_query)
+            if qs_author != []:
+                query_lists.append(qs_author)
+        print(len(query_lists))
+      
         
-        print("qs")
-        print(qs)
-        # elif author_exact_query != '' and author_exact_query is not None:
-        #     qs = posts.filter(author__username__exact=author_exact_query)
+        print(pub_date_min_query)
+        if pub_date_min_query != '' and pub_date_min_query is not None:
+            min_date_str = pub_date_min_query
+            min_date = datetime.strptime(min_date_str, '%Y-%m-%d')
+            qs_min_pub_date = posts.filter(published_on__date__gte=min_date)
+            query_lists.append(qs_min_pub_date)
+        if pub_date_max_query != '' and pub_date_max_query is not None:
+            max_date_str = pub_date_max_query
+            max_date = datetime.strptime(max_date_str, '%Y-%m-%d')
+            qs_max_pub_date = posts.filter(published_on__date__lte=max_date)
+            query_lists.append(qs_max_pub_date)
 
-        # elif pub_date_min_query != '' and pub_date_min_query is not None:
-        #     min_date_str = pub_date_min_query + ' 00:00:00.000000+00:00'
-        #     print(f'min_date_str: ' + min_date_str)
-        #     min_date = datetime.strptime(min_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
-        #     print(type(min_date))
-        #     print(min_date)
-        #     # qs = posts.filter(published_on >= min_date)
-        #     # print(qs)
-
-        # elif liked_count_min_query:
-        #     qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
+        print(posts[0].title)
+        print(type(posts[0].number_of_likes()))
+        if min_liked_query != '' and min_liked_query is not None:
+            print('hello liked')
+            qs_liked = [post for post in posts if (post.number_of_likes()>=int(min_liked_query))]
+            print(qs_liked)
+            if qs_liked != []:
+                query_lists.append(qs_liked)
 
         # elif region != 'Choose...':
         #     qs = [post for post in posts if post.get_region_display() == region]
@@ -387,6 +382,17 @@ class Search(View):
         # }
         # return render(request, "search.html", context)
 
+        if query_lists != []:
+            qs = query_lists[0]
+            if len(query_lists) > 1:
+                print("hello")
+                i = 0
+                for i in range(len(query_lists) - 1):
+                    print("hi")
+                    qs = [post for post in query_lists[i] if post in query_lists[i+1]]
+                    i += 1
+        
+        print("qs")
         context = {
             'categories': categories,
             'regions': regions,
