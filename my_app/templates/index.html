@@ -23,9 +23,9 @@
   <h2>Featured Stories</h2>
   <div class="row mt-5">
     {% for post in post_list %}
-      <div class="col-md-4 card">
+      <div class="col-md-4 card mx-1 p-2">
         <div class="image-wrapper">
-          <div class="image-box">
+          <div>
           {% if "placeholder" in post.featured_image.url %}
             <img class="card-img-top" src="media/default.jpg" alt="woods">
           {% else %}
@@ -33,7 +33,7 @@
           {% endif %}
           </div>
         </div>
-        <div class="my-card-body">
+        <div class="mx-2">
           <p class="mt-1"><strong>{{ post.title }}</strong><br>   <!-- good practice? -->
             Written by {{ post.author }}   |    {{ post.created_on|date:'M d, Y' }}<br>    <!-- want to put this on right  -->     
             {{ post.excerpt }}</p>

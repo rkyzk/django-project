@@ -1,13 +1,9 @@
 /**   common to pages  **/
 
 .image-wrapper {
-
+  width: 100%;
+  aspect-ratio: 4 / 3;
 }
-
-.image-box {
-
-}
-
 
 .btn-container {
   width: 250px;
