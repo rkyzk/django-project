@@ -1,5 +1,14 @@
 /**   common to pages  **/
 
+.image-wrapper {
+
+}
+
+.image-box {
+
+}
+
+
 .btn-container {
   width: 250px;
   display: flex;

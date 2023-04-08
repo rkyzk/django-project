@@ -23,19 +23,21 @@
   <h2>Featured Stories</h2>
   <div class="row mt-5">
     {% for post in post_list %}
-      <div class="col-md-4">
-        <div class="post_container">
+      <div class="col-md-4 card">
+        <div class="image-wrapper">
+          <div class="image-box">
           {% if "placeholder" in post.featured_image.url %}
             <img class="card-img-top" src="media/default.jpg" alt="woods">
           {% else %}
             <img class="card-img-top" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
           {% endif %}
-          <div class="post_intro">
-            <p class="mt-1"><strong>{{ post.title }}</strong><br>   <!-- good practice? -->
+          </div>
+        </div>
+        <div class="my-card-body">
+          <p class="mt-1"><strong>{{ post.title }}</strong><br>   <!-- good practice? -->
             Written by {{ post.author }}   |    {{ post.created_on|date:'M d, Y' }}<br>    <!-- want to put this on right  -->     
             {{ post.excerpt }}</p>
-            <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
-          </div>
+          <a href="{% url 'post_detail' post.slug %}">Read the full story</a>
         </div>
       </div>
     {% endfor %}
