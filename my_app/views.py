@@ -193,6 +193,7 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
             # else:
             post_form.instance.featured_image = photo.image
 
+            print(self.request.POST.keys())
             if 'submit' in self.request.POST.keys():
                 post_form.instance.status = 1
                 post_form.save()
@@ -301,39 +302,27 @@ class Search(View):
         kw_query_list = [request.GET.get('keyword_1'),
                          request.GET.get('keyword_2'),
                          request.GET.get('keyword_3')
-                    ]
-        
-        # selected_label = DROP1_DICT[selected_value]
-        # print(selected_value)
-        # print(selected_label)
-    
+                    ]   
     
         min_liked_query = request.GET.get('liked_count_min')
         pub_date_min_query = request.GET.get('date_min')
         pub_date_max_query = request.GET.get('date_max')
         
-        # category = request.GET.get('category')
-        # region = request.GET.get('region')
-        print("kw_q_list")
-        print(kw_query_list)
+        category = request.GET.get('category')
+        region = request.GET.get('region')
+
         qs_kw = []
         query_lists = []
         for kw in kw_query_list:
             if kw != '' and kw is not None:
                 qs = posts.filter(Q(title__icontains=kw) | Q(content__icontains=kw))
                 query_lists.append(qs)
-        print("q_lists")
-        print(query_lists)
 
-        if title_query != '' and title_query is not None:
-            print("title_q")
-            print(title_query)    
+        if title_query != '' and title_query is not None:  
             if title_filter_type == "contains":
                 qs_title = posts.filter(title__icontains=title_query)
             else:
                 qs_title = posts.filter(title__exact=title_query)
-            print("qs_title")
-            print(qs_title)
             if qs_title != []:
                 query_lists.append(qs_title)
 
@@ -344,10 +333,7 @@ class Search(View):
                 qs_author = posts.filter(author__username__exact=author_query)
             if qs_author != []:
                 query_lists.append(qs_author)
-        print(len(query_lists))
-      
-        
-        print(pub_date_min_query)
+       
         if pub_date_min_query != '' and pub_date_min_query is not None:
             min_date_str = pub_date_min_query
             min_date = datetime.strptime(min_date_str, '%Y-%m-%d')
@@ -359,8 +345,6 @@ class Search(View):
             qs_max_pub_date = posts.filter(published_on__date__lte=max_date)
             query_lists.append(qs_max_pub_date)
 
-        print(posts[0].title)
-        print(type(posts[0].number_of_likes()))
         if min_liked_query != '' and min_liked_query is not None:
             print('hello liked')
             qs_liked = [post for post in posts if (post.number_of_likes()>=int(min_liked_query))]
@@ -368,19 +352,12 @@ class Search(View):
             if qs_liked != []:
                 query_lists.append(qs_liked)
 
-        # elif region != 'Choose...':
-        #     qs = [post for post in posts if post.get_region_display() == region]
-        # elif category != 'Choose...':
-        #     qs = [post for post in posts if post.get_category_display() == category]
-        # # if qs = []:
-        #    # no_posts = "No posts found"
-        # else:
-        #     qs = []
-        # context = {
-        #     'queryset': qs,
-        #     # 'no_posts': no_posts
-        # }
-        # return render(request, "search.html", context)
+        if region != 'Choose...':
+            qs_region = [post for post in posts if post.get_region_display() == region]
+            query_lists.append(qs_region)
+        if category != 'Choose...':
+            qs_category = [post for post in posts if post.get_category_display() == category]
+            query_lists.append(qs_category)
 
         if query_lists != []:
             qs = query_lists[0]
@@ -391,12 +368,19 @@ class Search(View):
                     print("hi")
                     qs = [post for post in query_lists[i] if post in query_lists[i+1]]
                     i += 1
-        
-        print("qs")
+
+        no_results = False
+        print(dir(self.request.GET.keys()))
+        print(self.request.GET.values())
+        if 'submit' in self.request.GET.keys():
+            if qs == []:
+                no_results = True
+
         context = {
             'categories': categories,
             'regions': regions,
             'queryset': qs,
+            'no_results': no_results
         }
         return render(request, "search.html", context)
 
