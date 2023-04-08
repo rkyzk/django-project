@@ -2,11 +2,11 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic, View
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin # UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from .models import Post, Comment
 from .forms import CommentForm, PostForm, PhotoForm
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class PostList(generic.ListView):
@@ -17,19 +17,10 @@ class PostList(generic.ListView):
 
 class PostMoreStories(generic.ListView):
     model = Post
-    queryset = Post.objects.filter(status=2).order_by("-created_on")
+    utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    queryset = Post.objects.filter(Q(status=2) & Q(published_on__date__gte=utc_now.date()-timedelta(days=7)) ).order_by("-created_on")
     template_name = "more_stories.html"
-
-    # model = Post
-    # template_name = "more_stories.html"
-    # paginate_by = 6
-
-    # def get_context_data(self, **kwargs):
-    #     context = super(PostMoreStories, self).get_context_data(**kwargs)
-    #     queryset = []   # Post.objects.all()
-    #     # (published_on > (datetime.now() - timedelta(days=7)).date())
-    #     context['posts_this_week'] = queryset
-    #     return context
+    paginate_by = 6
 
 
 class PostDetail(View):
@@ -155,10 +146,14 @@ class AddStory(LoginRequiredMixin, View):
     
 
 
-class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
+class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin
 
     def get(self, request, slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=slug)
+        # Not Working at all
+        # if post.status == 2:
+        #     messages.add_message(self.request, messages.INFO, "You can't update a post that's been published.")
+        #     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
         original_data = {
                             "title": post.title,
                             "content": post.content,
@@ -177,6 +172,9 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
                 "post": post
             }
         )
+    
+    def test_func(self):
+        return self.get_object().author == self.request.user
 
 
     def post(self, request, slug, *args, **kwargs):
@@ -203,35 +201,16 @@ class UpdatePost(LoginRequiredMixin, View): # UserPassesTestMixin,
                 messages.add_message(self.request, messages.SUCCESS, 'Your draft has been saved.')
 
         else:
+            meessages.add_message(self.request, messages.INFO, "Error occured.  The change hasn't been saved.")
             print ("error occured")
-            print ("non",post_form.non_field_errors())   
-            field_errors = [ (field.label, field.errors) for field in post_form]
+            print ("non", post_form.non_field_errors())   
+            field_errors = [(field.label, field.errors) for field in post_form]
             print ("field", field_errors)
             print (post_form.errors)
         return HttpResponseRedirect(reverse('post_detail', args=[slug]))
 
 
-    # def test_func(self):
-    #     post = get_object_or_404(Post, slug=slug)
-    
-    #     if self.request.user == post.author:
-    #         return True
-    #     return False
-
-# class DeletePost(LoginRequiredMixin, generic.DeleteView): # UserPassesTestMixin, 
-#     model = Post
-#     template_name = "confirm_delete.html"
-#     success_url = '/'
-
-
-#     def test_func(self):
-#         post = self.get_object()
-#         if self.request.user == post.author:
-#             return True
-#         return False
-
-
-class DeletePost(View):
+class DeletePost(View):  # UserPassesTestMixin, 
 
     def get(self, request, slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=slug)
@@ -384,64 +363,8 @@ class Search(View):
         }
         return render(request, "search.html", context)
 
-    # def post(self, request, *args, **kwargs):
-    #     posts = Post.objects.all()
-    #     title_contains_query = request.POST.get('title_contains')
-    #     title_exact_query = request.POST.get('title_exact')
-    #     content_contains_query = request.POST.get('content_contains')
-    #     author_contains_query = request.POST.get('author_contains')
-    #     author_exact_query = request.POST.get('author_exact')
-    
-    #     liked_count_min_query = request.POST.get('liked_count_min')
-    #     pub_date_min_query = request.POST.get('date_min')
-    #     pub_date_max_query = request.POST.get('date_max')
-        
-    #     category = request.POST.get('category')
-    #     region = request.POST.get('region')
 
-    #     if title_contains_query != '' and title_contains_query is not None:
-    #         qs = posts.filter(title__icontains=title_contains_query)
-
-    #     elif title_exact_query != '' and title_exact_query is not None:
-    #         qs = posts.filter(title__exact=title_exact_query)
-
-    #     elif content_contains_query != '' and content_contains_query is not None:
-    #         qs = posts.filter(content__icontains=content_contains_query)
-
-    #     elif author_contains_query != '' and author_contains_query is not None:
-    #         qs = posts.filter(author__username__icontains=author_contains_query)
-
-    #     elif author_exact_query != '' and author_exact_query is not None:
-    #         qs = posts.filter(author__username__exact=author_exact_query)
-
-    #     elif pub_date_min_query != '' and pub_date_min_query is not None:
-    #         min_date_str = pub_date_min_query + ' 00:00:00.000000+00:00'
-    #         print(f'min_date_str: ' + min_date_str)
-    #         min_date = datetime.strptime(min_date_str, '%Y-%m-%d %H:%M:%S.%f%z')
-    #         print(type(min_date))
-    #         print(min_date)
-    #         # qs = posts.filter(published_on >= min_date)
-    #         # print(qs)
-
-    #     elif liked_count_min_query:
-    #         qs = [post for post in posts if (post.number_of_likes() >= int(liked_count_min_query))]
-
-    #     elif region != 'Choose...':
-    #         qs = [post for post in posts if post.get_region_display() == region]
-    #     elif category != 'Choose...':
-    #         qs = [post for post in posts if post.get_category_display() == category]
-    #     # if qs = []:
-    #        # no_posts = "No posts found"
-    #     else:
-    #         qs = []
-    #     context = {
-    #         'queryset': qs,
-    #         # 'no_posts': no_posts
-    #     }
-    #     return render(request, "search.html", context)
-
-
-class MyPage(View):
+class MyPage(LoginRequiredMixin, View):
     def get(self, request, id, *args, **kwargs):
         queryset = Post.objects.filter(author=id)  
         comments = Comment.objects.filter(name=id)
